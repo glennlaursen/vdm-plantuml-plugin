@@ -32,7 +32,11 @@ public class Vdm2umlCommand extends Command
 
 		String[] parts = line.split("\\s+");
 
-		if (parts.length == 2)
+		if (line.equals("vdm2uml"))
+		{
+			outputPath = "output";
+		}
+		else if (parts.length == 2)
 		{
 			outputPath = parts[1];
 		} 
