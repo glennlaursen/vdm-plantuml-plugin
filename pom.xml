@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<version>4.4.6</version>
+	<groupId>dk.au.ece.vdmj</groupId>
+	<artifactId>uml</artifactId>
+	<name>UML</name>
+	<description>Translations between VDM++ and PlantUML through VDMJ</description>
+
+	<developers>
+		<developer>
+			<id>NickBattle</id>
+			<name>Nick Battle</name>
+			<email>nick.battle@gmail.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>JonasLund</id>
+			<name>Jonas Lund</name>
+			<email>201906201@post.au.dk</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>LucasBjarkeJensen</id>
+			<name>Lucas Bjarke Jensen</name>
+			<email>201906201@post.au.dk</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>dk.au.ece.vdmj</groupId>
+     		<artifactId>lsp</artifactId>
+    		<version>4.4.6</version>
+   		</dependency>
+   		<dependency>
+     		<groupId>dk.au.ece.vdmj</groupId>
+     		<artifactId>vdmj</artifactId>
+    		<version>4.4.6</version>
+   		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<finalName>
+								${project.name}-${project.version}
+							</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
