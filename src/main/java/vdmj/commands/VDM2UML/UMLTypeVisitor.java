@@ -26,8 +26,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			arg.endClass = node.toString();
 			arg.isAsoc = true;
-		} else if (!arg.isMap)
+		} 
+		else if (!arg.isMap)
 			arg.inClassType += node.toString();
+		
 		return null;
 	}
 
@@ -63,6 +65,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 		if (arg.depth < 3)
 			node.seqof.apply(new UMLTypeVisitor(), arg);
+		
 		return null;
 	}
 
@@ -74,6 +77,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 		if (arg.depth < 3)
 			node.seqof.apply(new UMLTypeVisitor(), arg);
+		
 		return null;
 	}
 
@@ -81,6 +85,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
 		if (arg.depth < 2)
 			arg.multiplicity += _multiplicity;
+		
 		if (!arg.isMap && !arg.inClassType.contains("map"))
 			arg.inClassType += _type;
 	}
@@ -90,14 +95,18 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
 		arg.depth++;
 		arg.inClassType += "inmap ";
+
 		if (arg.depth > 2)
 			return null;
+		
 		if (arg.depth < 2)
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
+			{
 				arg.qualifier += "(";	
 				arg.qualifier += node.from.toString();
 				arg.qualifier += ")";
+			}
 		node.to.apply(new UMLTypeVisitor(), arg);
 
 		return null;
@@ -108,12 +117,15 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
 		arg.depth++;
 		arg.inClassType += "map ";
+
 		if (arg.depth > 2)
 			return null;
+		
 		if (arg.depth < 2)
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
 				arg.qualifier += node.from.toString();
+		
 		node.to.apply(new UMLTypeVisitor(), arg);
 
 		return null;
@@ -122,29 +134,31 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
     @Override
 	public List<Object> caseProductType(TCProductType node, UMLType arg)
 	{
-        /** Set type to * if outermost type*/
+        /** Set type to * */
 		arg.depth++;
 		if (arg.depth < 3 && !arg.isMap)
 		for (int i = 0; i < node.types.size()-1; i++)
 			arg.inClassType += "*";
+		
 		return null;
 	}
 
     @Override
 	public List<Object> caseUnionType(TCUnionType node, UMLType arg)
 	{
-        /** Set type to | if outermost type */
+        /** Set type to | */
 		arg.depth++;
 		if (arg.depth < 3 && !arg.isMap)
 			for (int i = 0; i < node.types.size()-1; i++)
 				arg.inClassType += "|";
+		
 		return null;
 	}
 
     @Override
 	public List<Object> caseOptionalType(TCOptionalType node, UMLType arg)
 	{
-        /** Set type to [] if outermost type*/
+        /** Set type to [] */
 		arg.depth++;
 		if (arg.depth < 3 && !arg.isMap)
 			arg.inClassType += "[]";
@@ -154,10 +168,11 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	@Override
 	public List<Object> caseRecordType(TCRecordType node, UMLType arg)
 	{
-        /** Set type to :: if outermost type*/
+        /** Set type to :: */
 		arg.depth++;
 		if (arg.depth < 3 && !arg.isMap)
 			arg.inClassType += "::";
+		
 		return null;
 	}
 

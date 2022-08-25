@@ -5,12 +5,13 @@ import vdmj.commands.VDM2UML.UMLGenerator;
 import workspace.PluginRegistry;
 import workspace.plugins.TCPlugin;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,39 +20,69 @@ import java.io.IOException;
 
 public class Vdm2umlCommand extends Command
 {	
+	public static final String USAGE = "Usage: <file>";
+
+	private String outputPath = "";
 	private StringBuilder boiler = new StringBuilder();
 
-	public Vdm2umlCommand(String message) 
+	public Vdm2umlCommand(String line) 
 	{
 		super();
+
+		String[] parts = line.split("\\s+");
+
+		if (parts.length == 1)
+		{
+			outputPath = parts[0];
+		} 
+		else 
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
+
+	String message = "";
 
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{	
-		String message = "";
+		if (Settings.dialect != Dialect.VDM_PP && Settings.dialect != Dialect.VDM_RT)
+		{
+			return new DAPMessageList(request,
+				false, "Command only available for VDM-PP and VDM-RT", null);	
+		}
 
 		TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList classes = tcPlugin.getTC();
-
-		Buffers buffers = new Buffers(classes);
+		Buffers buffers;
 		
-		for (TCClassDefinition cdef: classes)
+		if (!classes.isEmpty())
 		{
-			cdef.apply(new UMLGenerator(), buffers);
+			buffers = new Buffers(classes);
+			for (TCClassDefinition cdef: classes)
+			{
+				cdef.apply(new UMLGenerator(), buffers);
+			}
+		}
+		else
+		{
+			return new DAPMessageList(request,
+				false, "No classes in VDM project", null);	
 		}
 		
 		buildBoiler();
-		printPlant("./", buffers);
+		if (!printPlantUML(buffers))
+		{
+			return new DAPMessageList(request,
+				false, "Failed writing to output path", null);	
+		}
 
-		return new DAPMessageList(request, new JSONObject("result", message));
+		return new DAPMessageList(request, true, "UML generation completed", null);
 	}
 
 	public StringBuilder buildBoiler() 
 	{
 		boiler.append("@startuml\n\n");
-/* 		boiler.append("allow_mixing\n");
-		boiler.append("skinparam packageStyle frame\n"); */
 		boiler.append("hide empty members\n");
 		boiler.append("skinparam Shadowing false\n");
 		boiler.append("skinparam classAttributeIconSize 0\n");
@@ -65,11 +96,12 @@ public class Vdm2umlCommand extends Command
 		return boiler;
 	}
 
-	public void printPlant(String path, Buffers buffers)
+	public boolean printPlantUML(Buffers buffers)
     {   
-        try {
-			new File("./" + path).mkdirs();
-			File plantFile = new File(path + "/" + "Model" + ".wsd");
+        try 
+		{
+			new File("./" + outputPath).mkdirs();
+			File plantFile = new File(outputPath + "/" + "Model" + ".wsd");
 			
 			plantFile.createNewFile();
 			
@@ -81,10 +113,11 @@ public class Vdm2umlCommand extends Command
 			writer.write("@enduml");
 			writer.close();
 
-            System.out.println("generated PlantUML file");
-
-        } catch (IOException e) {
-            e.printStackTrace();
+			return true;
+        } 
+		catch (IOException e) 
+		{
+            return false;
         }
     }
 

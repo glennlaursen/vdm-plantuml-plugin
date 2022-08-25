@@ -76,7 +76,8 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			}
 			arg.asocs.append(varName);
 			arg.asocs.append("\n");
-		} else 
+		} 
+		else 
 		{
 			/*
 			 * Create instance variable as attribute in class 
@@ -167,10 +168,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{
 		String str0 = removeBrackets(args);
 		String splitter = "";
-		if(str0.contains("->"))
+		if (str0.contains("->"))
 			splitter = " ->";
 
-		if(str0.contains("==>"))
+		if (str0.contains("==>"))
 			splitter = " ==>";
 		
 		String seg1[] = str0.split(splitter);
