@@ -36,7 +36,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 
 import java.io.File;
-import java.io.FileWriter;  
+import java.io.FileWriter;
 import java.io.IOException;
 
 

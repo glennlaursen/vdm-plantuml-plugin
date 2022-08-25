@@ -1,6 +1,9 @@
 package vdmj.commands;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -16,18 +19,20 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import net.sourceforge.plantuml.Run;
+
 
 public class Uml2vdmCommand extends Command {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
-	private List<XMIClass> classList =new ArrayList<XMIClass>();  
-	String outputPath = "";
+	private List<XMIClass> classList = new ArrayList<XMIClass>();  
+	String path = "";
 
 	public Uml2vdmCommand(String[] argv)
 	{
 		if (argv.length == 2)
 		{
-			outputPath = argv[1];
+			path = argv[1];
 		}
 	}
 
@@ -36,23 +41,28 @@ public class Uml2vdmCommand extends Command {
 	{
 		try 
 		{
-			File inputFile = new File(outputPath);
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			File inputFile = new File(path);
+
+			
+
+
+
+			/* DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
          	Document doc = dBuilder.parse(inputFile);
-         	doc.getDocumentElement().normalize();
+         	doc.getDocumentElement().normalize(); */
 			
-			NodeList cList = doc.getElementsByTagName("UML:Class");
+/* 			NodeList cList = doc.getElementsByTagName("UML:Class");
 			NodeList gList = doc.getElementsByTagName("UML:Generalization");
 			NodeList rList = doc.getElementsByTagName("UML:Association");
 	 
 			createClasses(cList);
 			addInheritance(gList);
-			addAssociations(rList);
+			addAssociations(rList); */
 
 			VDMPrinter printer = new VDMPrinter(classList);
 			
-			printer.printVDM(outputPath.replace(inputFile.getName(), ""));
+			printer.printVDM(path.replace(inputFile.getName(), ""));
 		
 		}
 		catch (Exception e) {
