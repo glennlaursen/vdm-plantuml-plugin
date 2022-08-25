@@ -72,7 +72,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			if (!visibility.isEmpty())
 			{
 				arg.asocs.append(visibility);
-				arg.asocs.append(" ");
 			}
 			arg.asocs.append(varName);
 			arg.asocs.append("\n");
@@ -87,7 +86,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			if (!visibility.isEmpty())
 			{
 				arg.defs.append(visibility);
-				arg.defs.append(" ");
 			}
 			arg.defs.append(varName + " : " + umlType.inClassType);
 			arg.defs.append("\n");
@@ -105,7 +103,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
-		arg.defs.append(" ");
 		arg.defs.append(node.name.getName());
 		arg.defs.append(" : ");
 		arg.defs.append(umlType.inClassType);
@@ -122,7 +119,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		{
 			arg.defs.append("\t");
 			arg.defs.append(visibility(def.accessSpecifier));
-			arg.defs.append(" ");
 			arg.defs.append(def.name.getName());
 			arg.defs.append(" : ");
 			arg.defs.append(def.getType());
@@ -139,11 +135,8 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
-		arg.defs.append(" ");
 		arg.defs.append(node.name.getName());
-
 		arg.defs.append(getPlantArgs(node.getType().toString()));
-
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 

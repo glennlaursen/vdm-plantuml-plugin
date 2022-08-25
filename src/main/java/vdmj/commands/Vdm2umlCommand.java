@@ -20,7 +20,8 @@ import java.io.IOException;
 
 public class Vdm2umlCommand extends Command
 {	
-	public static final String USAGE = "Usage: <file>";
+	public static final String USAGE = "Usage: vdm2uml <folder>";
+	public static final String[] HELP =	{ "vdm2uml", "vdm2uml <folder> - transform VDM++ or VDM-RT project to PlantUML" };
 
 	private String outputPath = "";
 	private StringBuilder boiler = new StringBuilder();
@@ -31,9 +32,9 @@ public class Vdm2umlCommand extends Command
 
 		String[] parts = line.split("\\s+");
 
-		if (parts.length == 1)
+		if (parts.length == 2)
 		{
-			outputPath = parts[0];
+			outputPath = parts[1];
 		} 
 		else 
 		{
@@ -101,7 +102,7 @@ public class Vdm2umlCommand extends Command
         try 
 		{
 			new File("./" + outputPath).mkdirs();
-			File plantFile = new File(outputPath + "/" + "Model" + ".wsd");
+			File plantFile = new File("./" + outputPath + "/" + "Model" + ".wsd");
 			
 			plantFile.createNewFile();
 			
