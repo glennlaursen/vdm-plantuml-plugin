@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -18,23 +20,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import net.sourceforge.plantuml.BlockUml;
-import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.LineLocationImpl;
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.Run;
+import net.sourceforge.plantuml.PSystemBuilder;
 import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.classdiagram.ClassDiagram;
-import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory;
-import net.sourceforge.plantuml.code.ByteArray;
-import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.xmi.XmiClassDiagramStar;
+
 
 
 
@@ -84,35 +81,39 @@ public class Uml2vdmCommand extends Command {
 			}
 
 			List<StringLocated> sourceLocated = new ArrayList<>();
+			
 			LineLocationImpl location = new LineLocationImpl("uml", null);
 			for (String s : source) {
 				location = location.oneLineRead();
 				sourceLocated.add(new StringLocated(s, location));
 			}
-			UmlSource umlSource = UmlSource.create(sourceLocated, false);
-			
-			ClassDiagramFactory factory = new ClassDiagramFactory();
-			ClassDiagram classDiagram = factory.createEmptyDiagram(ThemeStyle.LIGHT_REGULAR, umlSource, null);
 
-			XmiClassDiagramStar xmiDiagram = new XmiClassDiagramStar(classDiagram);
+			PSystemBuilder p = new PSystemBuilder();
+			Diagram diagram = p.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated,
+            null);
+
+
+			XmiClassDiagramStar xmiDiagram = new XmiClassDiagramStar( (ClassDiagram) diagram);
 
 			OutputStream os = new ByteArrayOutputStream();
 			xmiDiagram.transformerXml(os);
 			
-			System.out.println(os.toString());
+			InputSource is = new InputSource();
+			is.setCharacterStream(new StringReader(os.toString()));
 
-			/* DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-         	Document doc = dBuilder.parse(inputFile);
-         	doc.getDocumentElement().normalize(); */
+         	Document doc = dBuilder.parse(is);
+         	doc.getDocumentElement().normalize(); 
 			
-/* 			NodeList cList = doc.getElementsByTagName("UML:Class");
+			NodeList cList = doc.getElementsByTagName("UML:Class");
 			NodeList gList = doc.getElementsByTagName("UML:Generalization");
 			NodeList rList = doc.getElementsByTagName("UML:Association");
 	 
 			createClasses(cList);
 			addInheritance(gList);
-			addAssociations(rList); */
+			addAssociations(rList); 
 
 			VDMPrinter printer = new VDMPrinter(classList);
 			
