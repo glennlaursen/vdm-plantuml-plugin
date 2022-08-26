@@ -69,18 +69,26 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+					<finalName>
+						${project.artifactId}-${project.version}
+					</finalName>
+				</configuration>
 				<executions>
 					<execution>
-						<id>default-jar</id>
+						<id>make-my-jar-with-dependencies</id>
 						<phase>package</phase>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
 						<goals>
-							<goal>jar</goal>
+							<goal>single</goal>
 						</goals>
-						<configuration>
-							<finalName>
-								${project.artifactId}-${project.version}
-							</finalName>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

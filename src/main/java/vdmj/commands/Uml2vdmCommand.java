@@ -54,7 +54,7 @@ public class Uml2vdmCommand extends Command {
 
 	public static List<StringLocated> convert(List<String> strings) {
 		final List<StringLocated> result = new ArrayList<>();
-		LineLocationImpl location = new LineLocationImpl("block", null);
+		LineLocationImpl location = new LineLocationImpl("uml", null);
 		for (String s : strings) {
 			location = location.oneLineRead();
 			result.add(new StringLocated(s, location));
@@ -74,12 +74,7 @@ public class Uml2vdmCommand extends Command {
 				source = br.lines().collect(Collectors.toList());
 			}
 
-			List<StringLocated> sourceLocated = new ArrayList<>();
-			LineLocationImpl location = new LineLocationImpl("uml", null);
-			for (String s : source) {
-				location = location.oneLineRead();
-				sourceLocated.add(new StringLocated(s, location));
-			}
+			List<StringLocated> sourceLocated = convert(source);
 			UmlSource umlSource = UmlSource.create(sourceLocated, false);
 			
 			ClassDiagramFactory factory = new ClassDiagramFactory();
