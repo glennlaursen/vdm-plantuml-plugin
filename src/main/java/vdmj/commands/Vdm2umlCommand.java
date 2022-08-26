@@ -17,11 +17,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 public class Vdm2umlCommand extends Command
 {	
 	public static final String USAGE = "Usage: vdm2uml <folder>";
-	public static final String[] HELP =	{ "vdm2uml", "vdm2uml <folder> - transform VDM++ or VDM-RT project to PlantUML" };
+	public static final String[] HELP =	{ "vdm2uml", "vdm2uml <folder> - transform VDM++ or VDM-RT model to PlantUML" };
 
 	private String outputPath = "";
 	private StringBuilder boiler = new StringBuilder();

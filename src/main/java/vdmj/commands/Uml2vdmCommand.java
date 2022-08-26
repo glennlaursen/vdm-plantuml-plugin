@@ -8,14 +8,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import vdmj.commands.UML2VDM.VDMPrinter;
-import vdmj.commands.UML2VDM.XMIAttribute;
-import vdmj.commands.UML2VDM.XMIClass;
-
-import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
@@ -23,7 +20,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.util.stream.Collectors;
+
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import vdmj.commands.UML2VDM.VDMPrinter;
+import vdmj.commands.UML2VDM.XMIAttribute;
+import vdmj.commands.UML2VDM.XMIClass;
+
 import net.sourceforge.plantuml.LineLocationImpl;
 import net.sourceforge.plantuml.PSystemBuilder;
 import net.sourceforge.plantuml.StringLocated;
@@ -32,15 +35,12 @@ import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.xmi.XmiClassDiagramStar;
 
-
-
-
 public class Uml2vdmCommand extends Command {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
 	private List<XMIClass> classList = new ArrayList<XMIClass>();  
-	public static final String USAGE = "Usage: Translate PlantUML to VDM";
-	public static final String[] HELP = { "" };
+	public static final String USAGE = "Usage: uml2vdm <file>";
+	public static final String[] HELP = { "uml2vdm", "uml2vdm <file> - translate PlantUML model to VDM++" };
 	
 	String path;
 
@@ -88,19 +88,16 @@ public class Uml2vdmCommand extends Command {
 				sourceLocated.add(new StringLocated(s, location));
 			}
 
-			PSystemBuilder p = new PSystemBuilder();
-			Diagram diagram = p.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated,
-            null);
+			PSystemBuilder pBuilder = new PSystemBuilder();
+			Diagram diagram = pBuilder.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated, null);
 
-
-			XmiClassDiagramStar xmiDiagram = new XmiClassDiagramStar( (ClassDiagram) diagram);
+			XmiClassDiagramStar xmiDiagram = new XmiClassDiagramStar((ClassDiagram) diagram);
 
 			OutputStream os = new ByteArrayOutputStream();
 			xmiDiagram.transformerXml(os);
 			
 			InputSource is = new InputSource();
 			is.setCharacterStream(new StringReader(os.toString()));
-
 
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -116,7 +113,6 @@ public class Uml2vdmCommand extends Command {
 			addAssociations(rList); 
 
 			VDMPrinter printer = new VDMPrinter(classList);
-			
 			printer.printVDM(path.replace(inputFile.getName(), ""));
 		
 		}
@@ -136,9 +132,7 @@ public class Uml2vdmCommand extends Command {
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) 
 			{
 				Element cElement = (Element) nNode;
-				
 				XMIClass c = new XMIClass(cElement);
-
 				classList.add(c);
 				
 				if (! (cElement.getAttribute("xmi.id") == null || (cElement == null)))
