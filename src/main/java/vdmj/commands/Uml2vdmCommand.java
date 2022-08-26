@@ -1,9 +1,9 @@
 package vdmj.commands;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+/* import java.io.FileNotFoundException;
+import java.io.FileReader; */
+import java.io.IOException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -19,46 +19,73 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+/* import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory; */
 import net.sourceforge.plantuml.Run;
+import net.sourceforge.plantuml.xmi;
 
 
 public class Uml2vdmCommand extends Command {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
 	private List<XMIClass> classList = new ArrayList<XMIClass>();  
-	String path = "";
+	public static final String USAGE = "Usage: Translate PlantUML to VDM";
+	public static final String[] HELP = { "" };
+	
+	String path;
 
-	public Uml2vdmCommand(String[] argv)
+	public Uml2vdmCommand(String line)
 	{
-		if (argv.length == 2)
+		String[] parts = line.split("\\s+", 2);
+		
+		if (parts.length == 2)
 		{
-			path = argv[1];
+			this.path = parts[1];
+		}
+		else
+		{
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
+		try { 
+
+			System.out.println("before xmi creation");
+
+			String[] plantArg = {path, "-txmi:star"}; 
+			Run.main(plantArg);
+		} catch (IOException e) {
+			return new DAPMessageList(request, false, "Diagram not found", null);
+		} catch(Exception e) {
+			return new DAPMessageList(request, false, "error", null);	
+		}
+		
 		try 
 		{
-			File inputFile = new File(path);
-
+			System.out.println("reached after xmi creation");
 			
 
+			String newPath = path.replace(".wsd", ".xmi");
+			
+			File inputFile = new File(newPath);			
 
 
-			/* DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
          	Document doc = dBuilder.parse(inputFile);
-         	doc.getDocumentElement().normalize(); */
+         	doc.getDocumentElement().normalize(); 
 			
-/* 			NodeList cList = doc.getElementsByTagName("UML:Class");
+			NodeList cList = doc.getElementsByTagName("UML:Class");
 			NodeList gList = doc.getElementsByTagName("UML:Generalization");
 			NodeList rList = doc.getElementsByTagName("UML:Association");
 	 
 			createClasses(cList);
 			addInheritance(gList);
-			addAssociations(rList); */
+			addAssociations(rList);
 
 			VDMPrinter printer = new VDMPrinter(classList);
 			

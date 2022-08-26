@@ -39,6 +39,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/* import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory;
+import net.sourceforge.plantuml.Run; */
+
 
 public class Vdm2umlCommand extends Command
 {	
