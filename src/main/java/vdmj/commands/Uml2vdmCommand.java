@@ -1,9 +1,25 @@
 package vdmj.commands;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-/* import java.io.FileNotFoundException;
-import java.io.FileReader; */
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -11,27 +27,20 @@ import vdmj.commands.UML2VDM.VDMPrinter;
 import vdmj.commands.UML2VDM.XMIAttribute;
 import vdmj.commands.UML2VDM.XMIClass;
 
-import java.util.*;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
-/* import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory; */
-import net.sourceforge.plantuml.Run;
-import net.sourceforge.plantuml.xmi;
-
+import net.sourceforge.plantuml.LineLocationImpl;
+import net.sourceforge.plantuml.PSystemBuilder;
+import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.api.ThemeStyle;
+import net.sourceforge.plantuml.classdiagram.ClassDiagram;
+import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.xmi.XmiClassDiagramStar;
 
 public class Uml2vdmCommand extends Command {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
 	private List<XMIClass> classList = new ArrayList<XMIClass>();  
-	public static final String USAGE = "Usage: Translate PlantUML to VDM";
-	public static final String[] HELP = { "" };
+	public static final String USAGE = "Usage: uml2vdm <file>";
+	public static final String[] HELP = { "uml2vdm", "uml2vdm <file> - translate PlantUML model to VDM++" };
 	
 	String path;
 
@@ -49,34 +58,50 @@ public class Uml2vdmCommand extends Command {
 		}
 	}
 
+	public static List<StringLocated> convert(List<String> strings) {
+		final List<StringLocated> result = new ArrayList<>();
+		LineLocationImpl location = new LineLocationImpl("uml", null);
+		for (String s : strings) {
+			location = location.oneLineRead();
+			result.add(new StringLocated(s, location));
+		}
+		return result;
+	}
+
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		try { 
-
-			System.out.println("before xmi creation");
-
-			String[] plantArg = {path, "-txmi:star"}; 
-			Run.main(plantArg);
-		} catch (IOException e) {
-			return new DAPMessageList(request, false, "Diagram not found", null);
-		} catch(Exception e) {
-			return new DAPMessageList(request, false, "error", null);	
-		}
-		
 		try 
 		{
-			System.out.println("reached after xmi creation");
+			File inputFile = new File(path);
+			List<String> source = new ArrayList<>();
 			
+			try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+				source = br.lines().collect(Collectors.toList());
+			}
 
-			String newPath = path.replace(".wsd", ".xmi");
+			List<StringLocated> sourceLocated = new ArrayList<>();
 			
-			File inputFile = new File(newPath);			
+			LineLocationImpl location = new LineLocationImpl("uml", null);
+			for (String s : source) {
+				location = location.oneLineRead();
+				sourceLocated.add(new StringLocated(s, location));
+			}
 
+			PSystemBuilder pBuilder = new PSystemBuilder();
+			Diagram diagram = pBuilder.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated, null);
+
+			XmiClassDiagramStar xmiDiagram = new XmiClassDiagramStar((ClassDiagram) diagram);
+
+			OutputStream os = new ByteArrayOutputStream();
+			xmiDiagram.transformerXml(os);
+			
+			InputSource is = new InputSource();
+			is.setCharacterStream(new StringReader(os.toString()));
 
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-         	Document doc = dBuilder.parse(inputFile);
+         	Document doc = dBuilder.parse(is);
          	doc.getDocumentElement().normalize(); 
 			
 			NodeList cList = doc.getElementsByTagName("UML:Class");
@@ -85,10 +110,9 @@ public class Uml2vdmCommand extends Command {
 	 
 			createClasses(cList);
 			addInheritance(gList);
-			addAssociations(rList);
+			addAssociations(rList); 
 
 			VDMPrinter printer = new VDMPrinter(classList);
-			
 			printer.printVDM(path.replace(inputFile.getName(), ""));
 		
 		}
@@ -108,9 +132,7 @@ public class Uml2vdmCommand extends Command {
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) 
 			{
 				Element cElement = (Element) nNode;
-				
 				XMIClass c = new XMIClass(cElement);
-
 				classList.add(c);
 				
 				if (! (cElement.getAttribute("xmi.id") == null || (cElement == null)))
