@@ -13,7 +13,8 @@ public class UMLType
     public int depth = 0;
     public PublicClassEnvironment env;
 
-    public UMLType(PublicClassEnvironment _env) {
+    public UMLType(PublicClassEnvironment _env) 
+    {
         env = _env;
     }
 }

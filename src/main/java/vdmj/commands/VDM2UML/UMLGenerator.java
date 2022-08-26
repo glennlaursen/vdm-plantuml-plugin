@@ -1,27 +1,3 @@
-/*******************************************************************************
- *
- *	Copyright (c) 2022 Nick Battle.
- *
- *	Author: Nick Battle
- *
- *	This file is part of VDMJ.
- *
- *	VDMJ is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	VDMJ is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
- *	SPDX-License-Identifier: GPL-3.0-or-later
- *
- ******************************************************************************/
-
 package vdmj.commands.VDM2UML;
 
 import com.fujitsu.vdmj.lex.Token;
@@ -96,11 +72,11 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			if (!visibility.isEmpty())
 			{
 				arg.asocs.append(visibility);
-				arg.asocs.append(" ");
 			}
 			arg.asocs.append(varName);
 			arg.asocs.append("\n");
-		} else 
+		} 
+		else 
 		{
 			/*
 			 * Create instance variable as attribute in class 
@@ -110,7 +86,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			if (!visibility.isEmpty())
 			{
 				arg.defs.append(visibility);
-				arg.defs.append(" ");
 			}
 			arg.defs.append(varName + " : " + umlType.inClassType);
 			arg.defs.append("\n");
@@ -128,7 +103,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
-		arg.defs.append(" ");
 		arg.defs.append(node.name.getName());
 		arg.defs.append(" : ");
 		arg.defs.append(umlType.inClassType);
@@ -145,7 +119,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		{
 			arg.defs.append("\t");
 			arg.defs.append(visibility(def.accessSpecifier));
-			arg.defs.append(" ");
 			arg.defs.append(def.name.getName());
 			arg.defs.append(" : ");
 			arg.defs.append(def.getType());
@@ -162,11 +135,8 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
-		arg.defs.append(" ");
 		arg.defs.append(node.name.getName());
-
 		arg.defs.append(getPlantArgs(node.getType().toString()));
-
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 
@@ -191,10 +161,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{
 		String str0 = removeBrackets(args);
 		String splitter = "";
-		if(str0.contains("->"))
+		if (str0.contains("->"))
 			splitter = " ->";
 
-		if(str0.contains("==>"))
+		if (str0.contains("==>"))
 			splitter = " ==>";
 		
 		String seg1[] = str0.split(splitter);

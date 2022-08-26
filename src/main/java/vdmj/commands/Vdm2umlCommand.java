@@ -1,27 +1,3 @@
-/*******************************************************************************
- *
- *	Copyright (c) 2022 Nick Battle.
- *
- *	Author: Nick Battle
- *
- *	This file is part of VDMJ.
- *
- *	VDMJ is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	VDMJ is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
- *	SPDX-License-Identifier: GPL-3.0-or-later
- *
- ******************************************************************************/
-
 package vdmj.commands;
 
 import vdmj.commands.VDM2UML.Buffers;
@@ -29,6 +5,8 @@ import vdmj.commands.VDM2UML.UMLGenerator;
 import workspace.PluginRegistry;
 import workspace.plugins.TCPlugin;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 
@@ -47,37 +25,74 @@ import net.sourceforge.plantuml.Run; */
 
 public class Vdm2umlCommand extends Command
 {	
+	public static final String USAGE = "Usage: vdm2uml <folder>";
+	public static final String[] HELP =	{ "vdm2uml", "vdm2uml <folder> - transform VDM++ or VDM-RT project to PlantUML" };
+
+	private String outputPath = "";
 	private StringBuilder boiler = new StringBuilder();
 
-	public Vdm2umlCommand(String message) 
+	public Vdm2umlCommand(String line) 
 	{
 		super();
+
+		String[] parts = line.split("\\s+");
+
+		if (line.equals("vdm2uml"))
+		{
+			outputPath = "output";
+		}
+		else if (parts.length == 2)
+		{
+			outputPath = parts[1];
+		} 
+		else 
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
+
+	String message = "";
 
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{	
+		if (Settings.dialect != Dialect.VDM_PP && Settings.dialect != Dialect.VDM_RT)
+		{
+			return new DAPMessageList(request,
+				false, "Command only available for VDM-PP and VDM-RT", null);	
+		}
+
 		TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList classes = tcPlugin.getTC();
-
-		Buffers buffers = new Buffers(classes);
+		Buffers buffers;
 		
-		for (TCClassDefinition cdef: classes)
+		if (!classes.isEmpty())
 		{
-			cdef.apply(new UMLGenerator(), buffers);
+			buffers = new Buffers(classes);
+			for (TCClassDefinition cdef: classes)
+			{
+				cdef.apply(new UMLGenerator(), buffers);
+			}
+		}
+		else
+		{
+			return new DAPMessageList(request,
+				false, "No classes in VDM project", null);	
 		}
 		
 		buildBoiler();
-		printPlant("./", buffers);
+		if (!printPlantUML(buffers))
+		{
+			return new DAPMessageList(request,
+				false, "Failed writing to output path", null);	
+		}
 
-		return new DAPMessageList();
+		return new DAPMessageList(request, true, "UML generation completed", null);
 	}
 
 	public StringBuilder buildBoiler() 
 	{
 		boiler.append("@startuml\n\n");
-/* 		boiler.append("allow_mixing\n");
-		boiler.append("skinparam packageStyle frame\n"); */
 		boiler.append("hide empty members\n");
 		boiler.append("skinparam Shadowing false\n");
 		boiler.append("skinparam classAttributeIconSize 0\n");
@@ -91,11 +106,12 @@ public class Vdm2umlCommand extends Command
 		return boiler;
 	}
 
-	public void printPlant(String path, Buffers buffers)
+	public boolean printPlantUML(Buffers buffers)
     {   
-        try {
-			new File("./" + path).mkdirs();
-			File plantFile = new File(path + "/" + "Model" + ".wsd");
+        try 
+		{
+			new File("./" + outputPath).mkdirs();
+			File plantFile = new File("./" + outputPath + "/" + "Model" + ".wsd");
 			
 			plantFile.createNewFile();
 			
@@ -107,10 +123,11 @@ public class Vdm2umlCommand extends Command
 			writer.write("@enduml");
 			writer.close();
 
-            System.out.println("generated PlantUML file");
-
-        } catch (IOException e) {
-            e.printStackTrace();
+			return true;
+        } 
+		catch (IOException e) 
+		{
+            return false;
         }
     }
 
