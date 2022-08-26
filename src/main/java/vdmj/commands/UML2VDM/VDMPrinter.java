@@ -20,13 +20,13 @@ public class VDMPrinter {
     public void printVDM(String path)
     {   
         try {
-            new File(path + "generated").mkdirs();
+            new File("generated").mkdirs();
 
             for (int n = 0; n < classList.size(); n++) 
             {	
                 XMIClass c = classList.get(n);
                 
-                File vdmFile = new File(path + "generated/" + c.getName() + ".vdmpp");
+                File vdmFile = new File("generated/" + c.getName() + ".vdmpp");
                 
                vdmFile.createNewFile();
                     
