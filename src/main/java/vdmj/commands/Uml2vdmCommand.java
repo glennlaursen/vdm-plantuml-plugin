@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.classdiagram.ClassDiagramFactory; */
 import net.sourceforge.plantuml.Run;
-import net.sourceforge.plantuml.xmi;
+
 
 
 public class Uml2vdmCommand extends Command {
