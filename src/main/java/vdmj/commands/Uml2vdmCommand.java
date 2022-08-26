@@ -42,13 +42,22 @@ public class Uml2vdmCommand extends Command {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
 	private List<XMIClass> classList = new ArrayList<XMIClass>();  
-	String path = "";
+	public static final String USAGE = "Usage: Translate PlantUML to VDM";
+	public static final String[] HELP = { "" };
+	
+	String path;
 
-	public Uml2vdmCommand(String[] argv)
+	public Uml2vdmCommand(String line)
 	{
-		if (argv.length == 2)
+		String[] parts = line.split("\\s+", 2);
+		
+		if (parts.length == 2)
 		{
-			path = argv[1];
+			this.path = parts[1];
+		}
+		else
+		{
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
