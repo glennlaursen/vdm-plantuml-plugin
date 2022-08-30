@@ -1,5 +1,6 @@
 /.settings/
 /.project
 target
+repo
 .idea
 .ci-friendly-pom.xml

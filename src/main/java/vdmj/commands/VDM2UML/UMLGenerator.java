@@ -117,11 +117,15 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{
 		for (TCDefinition def: node.getDefinitions())
 		{
+			TCType type = def.getType();
+			UMLType umlType = new UMLType(Buffers.env);
+			type.apply(new UMLTypeVisitor(), umlType);
+			
 			arg.defs.append("\t");
 			arg.defs.append(visibility(def.accessSpecifier));
 			arg.defs.append(def.name.getName());
 			arg.defs.append(" : ");
-			arg.defs.append(def.getType());
+			arg.defs.append(umlType.inClassType);
 			arg.defs.append(" <<value>>");
 			arg.defs.append("\n");
 		}
@@ -129,7 +133,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		return null;
 	}
 	
-
 	@Override
 	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, Buffers arg)
 	{
@@ -198,7 +201,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			res += "<u>";
 		
 		return res;
-	}  
+	}
 
 	private String removeBrackets(String str)
 	{

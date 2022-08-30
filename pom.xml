@@ -28,7 +28,7 @@
 		<developer>
 			<id>LucasBjarkeJensen</id>
 			<name>Lucas Bjarke Jensen</name>
-			<email>201906201@post.au.dk</email>
+			<email>201907355@post.au.dk</email>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -51,7 +51,19 @@
 			<artifactId>plantuml</artifactId>
 			<version>1.2022.7</version>
 		</dependency>
+<!-- 		<dependency>
+			<groupId>net.sourceforge.plantuml</groupId>
+			<artifactId>plantuml</artifactId>
+			<version>1.2022.8beta2-SNAPSHOT</version>
+		</dependency> -->
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>repo</id>
+			<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
