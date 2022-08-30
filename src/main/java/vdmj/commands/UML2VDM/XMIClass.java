@@ -12,11 +12,12 @@ import java.util.*;
 public class XMIClass {
 
     private String name;
-    private String ID;
-    private String visibility;
+/*     private String ID;
+    private String visibility; */
     private String parent;
     private Boolean isInherited;
-
+    private Boolean isAbstract;
+    
     private List<XMIAttribute> typeList = new ArrayList<XMIAttribute>();   
     private List<XMIAttribute> valueList = new ArrayList<XMIAttribute>();   
     private List<XMIAttribute> varList = new ArrayList<XMIAttribute>(); 
@@ -26,8 +27,12 @@ public class XMIClass {
 
     public XMIClass(Element cElement){
         this.name = cElement.getAttribute("name");
-        this.ID = cElement.getAttribute("xmi.id");
+        //this.ID = cElement.getAttribute("xmi.id");
         this.isInherited = false;
+        this.isAbstract = false;
+
+        if(cElement.getAttribute("isAbstract").equals("true"))
+            this.isAbstract = true;
 
         NodeList attributeList = cElement.getElementsByTagName("UML:Attribute");
         if(! (attributeList.getLength() == 0))
@@ -93,30 +98,18 @@ public class XMIClass {
     {
         this.isInherited = bool;
     }
-
-    public Boolean getInheritance()
+    
+    public String getIsAbstract()
     {
-        return isInherited;
+        if (this.isAbstract == true)
+            return "Abstract";
+
+        else return "";
     }
 
     public String getName()
     {
         return name;
-    }
-
-    public String getID()
-    {
-        return ID;
-    }
-
-    public String getVisibility()
-    {
-        return visibility;
-    }
-
-    public String getParent()
-    {
-        return parent;
     }
 
     public List<XMIAttribute> getIVariables()
@@ -147,7 +140,14 @@ public class XMIClass {
         return functionList;
     }
 
+    public String getClassString()
+    {
+        String abs = this.isAbstract ? "abstract " : "";
 
+        String inh = this.isInherited ? " is subclas of " + this.parent : "";
+
+        return abs + "class " + this.name + inh + "\n\n";   
+    }
 
 }
 

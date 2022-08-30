@@ -1,6 +1,4 @@
 package vdmj.commands.UML2VDM;
-
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 public class XMIAttribute {
@@ -17,20 +15,24 @@ public class XMIAttribute {
     private MulTypes mulType;
     private QualiTypes qualiType;
     private Boolean isQualified;
-
     private String qualifier;
-
     private String visibility;
     private Boolean isAssociative;
-
+    private Boolean isStatic;
+    private Boolean isAbstract;
 
     public XMIAttribute(Element aElement)
     {     
         this.isAssociative = false;
         this.isQualified = false;
+        this.isStatic = false;
+        this.isAbstract = false;
 
+        if(aElement.getAttribute("isStatic").equals("true"))
+            this.isStatic = true;
 
-        this.name = (aElement.getAttribute("name"));
+        if(aElement.getAttribute("isAbstract").equals("true"))
+            this.isAbstract = true;
 
         setAttType(aElement);
 
@@ -47,8 +49,8 @@ public class XMIAttribute {
     {
         NodeList relAttList = rElement.getElementsByTagName("UML:AssociationEnd");
         
-        Element relStart  = (Element) relAttList.item(1);
-        Element relEnd  = (Element) relAttList.item(0);
+        Element relStart  = (Element) relAttList.item(0);
+        Element relEnd  = (Element) relAttList.item(1);
         
         String indicator = relStart.getAttribute("name");
         String mult = relEnd.getAttribute("name");
@@ -121,23 +123,22 @@ public class XMIAttribute {
         if (aElement.getAttribute("name").contains("«value»"))
         {
             this.attType = AttTypes.value;
-            this.name = remove(this.name, "«value»");      
+            this.name = remove(aElement.getAttribute("name"), "«value»");      
         }		
 
-        if (aElement.getAttribute("name").contains("«type»"))
+        else if (aElement.getAttribute("name").contains("«type»"))
         {
             this.attType = AttTypes.type;
-            this.name = remove(this.name, " «type»");      
+            this.name = remove(aElement.getAttribute("name"), "«type»");      
         }
         
-        if (! (aElement.getAttribute("name").contains("«type»") || 
-                aElement.getAttribute("name").contains("«value»")))
+        else
         {
             this.attType = AttTypes.var;
+            this.name = aElement.getAttribute("name");
         }
     }
 
-   
     private String remove(String s, String r)
 	{
         return s.replace(r, "");
@@ -166,10 +167,6 @@ public class XMIAttribute {
             this.relName = parent;
     }
 
-    public void setVisibility(String newVis)
-    {
-        this.visibility = newVis;
-    }
 
     public String getStartID()
     {
@@ -181,40 +178,11 @@ public class XMIAttribute {
         return endID;
     }
 
-    public String getVisibility()
-    {
-        return visibility;
-    }
-
-    public Boolean getIsAssociative()
-    {
-        return isAssociative;
-    }
-
-    public Boolean getIsQualified()
-    {
-        return isQualified;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getRelName()
-    {
-        return relName;
-    }  
-
     public AttTypes getAttType()
     {
         return attType;
     }
 
-    public QualiTypes getQualiType()
-    {
-        return qualiType;
-    }
 
     public String getMulType()
     {
@@ -236,10 +204,56 @@ public class XMIAttribute {
         else
             return "";
     }
-    
-    public String getQualifier()
+
+    public String getAttributeString()
     {
-        return qualifier;
+        if(this.attType == AttTypes.value)
+        {
+            return this.visibility + this.name + " = undef;\n";
+        }
+
+        else if (this.attType == AttTypes.type)
+        {
+            String eq = "=";
+           
+            if(this.name.contains("::"))
+            {
+                this.name = remove(this.name, "::");
+                eq = "::";
+            }    
+
+            if(this.name.contains(":"))
+            {
+                String segments[] = this.name.split(":");
+                
+                if(segments[segments.length - 1].equals(segments[0]))
+                    return this.visibility + segments[0] + eq + " " + "undef" + ";\n";
+
+                else
+                    return this.visibility + segments[0] + eq + segments[segments.length - 1] + ";\n";
+            }
+            else
+                return this.visibility + this.name + " " + eq + " " + "undef" + ";\n";
+        }
+       
+        else if (this.attType == AttTypes.var)
+        {
+            String abs = this.isAbstract ? "abstract " : "";
+            String stat = this.isStatic ? "static " : "";
+            String maptype = "";
+
+            if(this.qualiType == QualiTypes.map)
+                    maptype = "map ";
+            if(this.qualiType == QualiTypes.inmap)
+                    maptype = "inmap ";
+
+            String map = this.isQualified ? maptype + this.qualifier + " to " :  "";
+            String asoc = this.isAssociative ? getMulType() + this.relName : "";
+
+            return stat + abs + this.name + " : " + map + asoc + ";\n";
+        }
+        
+        else return "undef";
     }
     
 }

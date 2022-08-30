@@ -2,8 +2,6 @@ package vdmj.commands.UML2VDM;
 
 import java.util.*;
 
-import vdmj.commands.UML2VDM.XMIAttribute.QualiTypes;
-
 import java.io.File; 
 import java.io.IOException;
 import java.io.FileWriter;  
@@ -33,16 +31,15 @@ public class VDMPrinter {
                 FileWriter writer = new FileWriter(vdmFile.getAbsolutePath());
                 
                 printClass(writer, c);
-                printValues(writer, c);
+                printAttributes(writer, c);
+              /*   printValues(writer, c);
                 printTypes(writer, c);
-                printIVariables(writer, c);
+                printIVariables(writer, c); */
                 printOperations(writer, c);
                 printFunctions(writer, c);
 
                 writer.write("\n\nend " + c.getName());
                 writer.close();
-
-                
             }
 
             System.out.println("generated vdm files");
@@ -55,18 +52,60 @@ public class VDMPrinter {
     private void printClass(FileWriter writer, XMIClass c)
     {
         try {
-            if(c.getInheritance())
-                writer.write("class " + c.getName() + " is subclass of " + c.getParent() + "\n\n");
-            
-            else 
-                writer.write("class " + c.getName() + "\n\n");
-            
+            writer.write(c.getClassString());
         } catch (IOException e) {
             e.printStackTrace();
         }       
     }     
+
+    private void printAttributes(FileWriter writer, XMIClass c)
+    {
+        try {
+            if (!c.getValues().isEmpty())
+            {
+                List<XMIAttribute> valueList = c.getValues();
+                writer.write("values\n");
+                for (int count = 0; count < valueList.size(); count++) 
+                {
+                    XMIAttribute val = valueList.get(count);
+                    writer.write(val.getAttributeString());
+                }
+                writer.write("\n");
+            }
+            
+            if (!c.getTypes().isEmpty())
+            {
+                List<XMIAttribute> typeList = c.getTypes();
+                writer.write("types\n");
+
+                for (int count = 0; count < typeList.size(); count++) 
+                {
+                    XMIAttribute type = typeList.get(count);
+                    writer.write(type.getAttributeString());
+                }
+                writer.write("\n");
+            }
+
+            if (!c.getIVariables().isEmpty())
+            {
+                List<XMIAttribute> varList = c.getIVariables();
+
+                writer.write("instance variables\n");
+
+                for (int count = 0; count < varList.size(); count++) 
+                {
+                    XMIAttribute var = varList.get(count);
+                    writer.write(var.getAttributeString());
+                }
+                writer.write("\n");
+            }
+    } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     
-    private void printValues(FileWriter writer, XMIClass c)
+    /* private void printValues(FileWriter writer, XMIClass c)
     {
         try {
             if (!c.getValues().isEmpty())
@@ -78,7 +117,7 @@ public class VDMPrinter {
                 for (int count = 0; count < valueList.size(); count++) 
                 {
                     XMIAttribute val = valueList.get(count);
-                    writer.write(val.getVisibility() + val.getName() + " = ;\n");
+                    writer.write(val.getVisibility() + val.getName() + " = undef;\n");
                 }
 
                 writer.write("\n");
@@ -87,9 +126,9 @@ public class VDMPrinter {
         } catch (IOException e) {
             e.printStackTrace();
         }       
-    } 
+    }  */
 
-    private void printTypes(FileWriter writer, XMIClass c)
+  /*   private void printTypes(FileWriter writer, XMIClass c)
     {
         try {
             if (!c.getTypes().isEmpty())
@@ -125,9 +164,9 @@ public class VDMPrinter {
         } catch (IOException e) {
             e.printStackTrace();
         }       
-    }
+    } */
 
-    private void printIVariables(FileWriter writer, XMIClass c)
+    /* private void printIVariables(FileWriter writer, XMIClass c)
     {
         try {
             if (!c.getIVariables().isEmpty())
@@ -166,7 +205,7 @@ public class VDMPrinter {
         } catch (IOException e) {
             e.printStackTrace();
         }       
-    } 
+    }  */
 
     private void printOperations(FileWriter writer, XMIClass c)
     {
