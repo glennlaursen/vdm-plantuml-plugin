@@ -3,8 +3,6 @@ package vdmj.commands;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -12,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
@@ -20,13 +17,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import vdmj.commands.UML2VDM.VDMPrinter;
 import vdmj.commands.UML2VDM.XMIAttribute;
 import vdmj.commands.UML2VDM.XMIClass;
-
 import net.sourceforge.plantuml.LineLocationImpl;
 import net.sourceforge.plantuml.PSystemBuilder;
 import net.sourceforge.plantuml.StringLocated;
@@ -69,7 +64,6 @@ public class Uml2vdmCommand extends Command {
 			try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
 				source = br.lines().collect(Collectors.toList());
 			}
-
 			List<StringLocated> sourceLocated = convert(source);
 			PSystemBuilder pBuilder = new PSystemBuilder();
 			Diagram diagram = pBuilder.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated, null);
