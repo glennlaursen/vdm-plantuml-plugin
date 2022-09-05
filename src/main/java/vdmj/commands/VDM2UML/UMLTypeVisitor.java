@@ -39,7 +39,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
 		setSeqConstructor("1..*", "set1 of ", arg);
 
-		if (arg.depth < 3)
+		if (arg.depth < arg.maxDepth)
 			node.setof.apply(new UMLTypeVisitor(), arg);
 		
 		return null;
@@ -51,7 +51,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
 		setSeqConstructor("*", "set of ", arg);
 
-		if (arg.depth < 3)
+		if (arg.depth < arg.maxDepth)
 			node.setof.apply(new UMLTypeVisitor(), arg);
 
 		return null;
@@ -63,7 +63,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
 		setSeqConstructor("(1..*)", "seq1 of ", arg);
 
-		if (arg.depth < 3)
+		if (arg.depth < arg.maxDepth)
 			node.seqof.apply(new UMLTypeVisitor(), arg);
 		
 		return null;
@@ -75,7 +75,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
         setSeqConstructor("(*)", "seq of ", arg);
 
-		if (arg.depth < 3)
+		if (arg.depth < arg.maxDepth)
 			node.seqof.apply(new UMLTypeVisitor(), arg);
 		
 		return null;
@@ -83,7 +83,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 	private void setSeqConstructor(String _multiplicity, String _type, UMLType arg)
 	{
-		if (arg.depth < 2)
+		if (arg.depth < arg.maxDepth - 1)
 			arg.multiplicity += _multiplicity;
 		
 		if (!arg.isMap && !arg.inClassType.contains("map"))
@@ -99,7 +99,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		if (arg.depth > 2)
 			return null;
 		
-		if (arg.depth < 2)
+		if (arg.depth < arg.maxDepth - 1)
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
 			{
@@ -121,7 +121,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		if (arg.depth > 2)
 			return null;
 		
-		if (arg.depth < 2)
+		if (arg.depth < arg.maxDepth - 1)
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
 				arg.qualifier += node.from.toString();
@@ -136,7 +136,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
         /** Set type to * */
 		arg.depth++;
-		if (arg.depth < 3 && !arg.isMap)
+		if (arg.depth < arg.maxDepth && !arg.isMap)
 		for (int i = 0; i < node.types.size()-1; i++)
 			arg.inClassType += "*";
 		
@@ -148,7 +148,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
         /** Set type to | */
 		arg.depth++;
-		if (arg.depth < 3 && !arg.isMap)
+		if (arg.depth < arg.maxDepth && !arg.isMap)
 			for (int i = 0; i < node.types.size()-1; i++)
 				arg.inClassType += "|";
 		
@@ -160,7 +160,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
         /** Set type to [] */
 		arg.depth++;
-		if (arg.depth < 3 && !arg.isMap)
+		if (arg.depth < arg.maxDepth && !arg.isMap)
 			arg.inClassType += "[]";
 		return null;
 	}
@@ -170,10 +170,17 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
         /** Set type to :: */
 		arg.depth++;
-		if (arg.depth < 3 && !arg.isMap)
+		if (arg.depth < arg.maxDepth && !arg.isMap)
 			arg.inClassType += "::";
 		
 		return null;
+	}
+
+	private boolean isBasicType(TCType type) 
+	{
+		
+
+		return true;
 	}
 
 	@Override
