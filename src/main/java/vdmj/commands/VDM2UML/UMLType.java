@@ -10,8 +10,15 @@ public class UMLType
     public String multiplicity = "";
     public String endClass = "";
     public String inClassType = "";
+    public int maxDepth = 3;
     public int depth = 0;
     public PublicClassEnvironment env;
+
+    public UMLType(PublicClassEnvironment _env, int _maxDepth) 
+    {
+        env = _env;
+        maxDepth = _maxDepth;
+    }
 
     public UMLType(PublicClassEnvironment _env) 
     {
