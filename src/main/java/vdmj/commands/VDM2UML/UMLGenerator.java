@@ -87,7 +87,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			{
 				arg.defs.append(visibility);
 			}
-			arg.defs.append(varName + " : " + umlType.inClassType);
+			arg.defs.append(varName + ": " + umlType.inClassType);
 			arg.defs.append("\n");
 		}
 		
@@ -104,7 +104,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
-		arg.defs.append(" : ");
+		arg.defs.append(": ");
 		arg.defs.append(umlType.inClassType);
 		arg.defs.append(" <<type>>");
 		arg.defs.append("\n");		
@@ -124,7 +124,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			arg.defs.append("\t");
 			arg.defs.append(visibility(def.accessSpecifier));
 			arg.defs.append(def.name.getName());
-			arg.defs.append(" : ");
+			arg.defs.append(": ");
 			arg.defs.append(umlType.inClassType);
 			arg.defs.append(" <<value>>");
 			arg.defs.append("\n");
@@ -198,7 +198,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 			res += "#";
 		
 		if (access.isStatic)
-			res += "<u>";
+			res += "{static}";
 		
 		return res;
 	}
