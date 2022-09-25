@@ -6,7 +6,12 @@ import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 public class Buffers 
 {
     public StringBuilder defs;
+    public StringBuilder vars;
+    public StringBuilder vals;
+    public StringBuilder ops;
+    public StringBuilder funcs;
     public StringBuilder asocs;
+
     public static PublicClassEnvironment env;
 
     public Buffers(TCClassList classList)

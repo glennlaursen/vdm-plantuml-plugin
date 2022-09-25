@@ -41,6 +41,11 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	{	
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(Buffers.env);
+		System.out.println("#TYPE# " + type.toDetailedString() + "\n");
+		for (TCDefinition def: node.getDefinitions())
+		{
+			System.out.println("#DEF# " + def.toString() + "\n");
+		}
 		type.apply(new UMLTypeVisitor(), umlType);
 
 		String visibility = visibility(node.accessSpecifier);

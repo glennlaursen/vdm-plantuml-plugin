@@ -176,11 +176,27 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		return null;
 	}
 
-	private boolean isBasicType(TCType type) 
+	private boolean isBasicType(TCType type, UMLType arg) 
 	{
-		
-
-		return true;
+		if (type.isClass(arg.env))
+			return true;
+		if (type.toString() == "bool")
+			return true;
+		if (type.toString() == "nat")
+			return true;
+		if (type.toString() == "nat1")
+			return true;
+		if (type.toString() == "int")
+			return true;		
+		if (type.toString() == "rat")
+			return true;
+		if (type.toString() == "real")
+			return true;
+		if (type.toString() == "char")
+			return true;
+		if (type.toString() == "token")
+			return true;
+		return false;
 	}
 
 	@Override
