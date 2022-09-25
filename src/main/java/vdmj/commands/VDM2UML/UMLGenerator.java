@@ -12,16 +12,16 @@ import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
+public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 {
 	@Override
-	public Object caseDefinition(TCDefinition node, Buffers arg)
+	public Object caseDefinition(TCDefinition node, PlantBuilder arg)
 	{
 		return null;
 	}
 
 	@Override
-	public Object caseClassDefinition(TCClassDefinition node, Buffers arg)
+	public Object caseClassDefinition(TCClassDefinition node, PlantBuilder arg)
 	{
 		arg.defs.append("class ");
 		arg.defs.append(node.name.getName());
@@ -37,10 +37,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseInstanceVariableDefinition(TCInstanceVariableDefinition node, Buffers arg)
+	public Object caseInstanceVariableDefinition(TCInstanceVariableDefinition node, PlantBuilder arg)
 	{	
 		TCType type = node.getType();
-		UMLType umlType = new UMLType(Buffers.env);
+		UMLType umlType = new UMLType(PlantBuilder.env);
 		System.out.println("#TYPE# " + type.toDetailedString() + "\n");
 		for (TCDefinition def: node.getDefinitions())
 		{
@@ -100,10 +100,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseTypeDefinition(TCTypeDefinition node, Buffers arg)
+	public Object caseTypeDefinition(TCTypeDefinition node, PlantBuilder arg)
 	{
 		TCType type = node.getType();
-		UMLType umlType = new UMLType(Buffers.env);
+		UMLType umlType = new UMLType(PlantBuilder.env);
 		type.apply(new UMLTypeVisitor(), umlType);
 
 		arg.defs.append("\t");
@@ -118,12 +118,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 
 	@Override
-	public Object caseValueDefinition(TCValueDefinition node, Buffers arg)
+	public Object caseValueDefinition(TCValueDefinition node, PlantBuilder arg)
 	{
 		for (TCDefinition def: node.getDefinitions())
 		{
 			TCType type = def.getType();
-			UMLType umlType = new UMLType(Buffers.env);
+			UMLType umlType = new UMLType(PlantBuilder.env);
 			type.apply(new UMLTypeVisitor(), umlType);
 			
 			arg.defs.append("\t");
@@ -139,7 +139,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, Buffers arg)
+	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, PlantBuilder arg)
 	{
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
@@ -152,7 +152,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseExplicitOperationDefinition(TCExplicitOperationDefinition node, Buffers arg)
+	public Object caseExplicitOperationDefinition(TCExplicitOperationDefinition node, PlantBuilder arg)
 	{	
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
