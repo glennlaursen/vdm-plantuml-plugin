@@ -43,8 +43,9 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			node.type.apply(new UMLTypeVisitor(), arg);
 		}
-		else 
+		else
 		{
+			System.out.println("##### Named Type: " + node.toString());
 			arg.inClassType += node.toString();
 		}
 
@@ -94,6 +95,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         setSeqConstructor("(*)", "seq of ", arg);
 
 		if (arg.depth < arg.maxDepth)
+			System.out.println("##### Seq of _: " + node.seqof.toString());
 			node.seqof.apply(new UMLTypeVisitor(), arg);
 		
 		return null;
@@ -157,8 +159,15 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         /** Set type to * */
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
-		for (int i = 0; i < node.types.size() - 1; i++)
-			arg.inClassType += "*";
+		{
+			for (int i = 0; i < node.types.size() - 1; i++)
+				if (i > node.types.size() - 1)
+				{
+					arg.inClassType += "...";
+					return null;
+				}
+				arg.inClassType += "*";
+		}
 		
 		return null;
 	}
@@ -169,9 +178,16 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         /** Set type to | */
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
+		{		
 			for (int i = 0; i < node.types.size() - 1; i++)
+				if (i > node.types.size() - 1)
+				{
+					arg.inClassType += "...";
+					return null;
+				}
 				arg.inClassType += "|";
-		
+		}
+
 		return null;
 	}
 
@@ -182,6 +198,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
 			arg.inClassType += "[]";
+
 		return null;
 	}
 
@@ -208,12 +225,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			
 			// Remove whitespace at end of parameter
 			if (arg.paramsType.length() > 1)
+			{
+				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
 				{
-					if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
-						{
-							arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
-						}
+					arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
 				}
+			}
 			if (i < node.parameters.size() - 1)
 				arg.paramsType += ", ";
 			i += 1;
@@ -237,12 +254,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 			// Remove whitespace at end of parameter
 			if (arg.paramsType.length() > 1)
+			{
+				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
 				{
-					if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
-						{
-							arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
-						}
+					arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
 				}
+			}
 			if (i < node.parameters.size() - 1)
 				arg.paramsType += ", ";
 			i += 1;

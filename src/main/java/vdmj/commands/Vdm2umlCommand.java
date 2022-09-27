@@ -105,7 +105,7 @@ public class Vdm2umlCommand extends Command
         try 
 		{
 			new File("./" + outputPath).mkdirs();
-			File plantFile = new File("./" + outputPath + "/" + "Model" + ".wsd");
+			File plantFile = new File("./" + outputPath + "/" + "Model" + ".puml");
 			
 			plantFile.createNewFile();
 			

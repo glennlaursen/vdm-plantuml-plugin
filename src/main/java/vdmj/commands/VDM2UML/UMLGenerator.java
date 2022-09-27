@@ -138,6 +138,8 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, PlantBuilder arg)
 	{
+		System.out.println("### Operation: " + node.name.getName());
+
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -167,8 +169,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
-		arg.defs.append("): ");
-		arg.defs.append(umlType.returnType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
+		}
 		arg.defs.append("\n");
 
 		return null;
@@ -184,8 +190,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
-		arg.defs.append("): ");
-		arg.defs.append(umlType.returnType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
+		}
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 
