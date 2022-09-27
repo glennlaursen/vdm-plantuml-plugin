@@ -1,8 +1,6 @@
 package vdmj.commands.UML2VDM;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import net.sourceforge.plantuml.sequencediagram.teoz.ElseTile;
 public class XMIAttribute {
     
     public enum AttTypes {type, value, var}

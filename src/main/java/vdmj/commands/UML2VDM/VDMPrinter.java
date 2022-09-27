@@ -79,12 +79,8 @@ public class VDMPrinter {
                 {
                     XMIAttribute type = typeList.get(count);
                     String s = type.getAttributeString();
-                    
-                    System.out.println(s);
-
-                    /* if(s.contains("«type»"))
-                        s = s.replace("«type»", "");
- */
+                
+     
                     writer.write(s);
                 }
                 writer.write("\n");
