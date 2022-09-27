@@ -11,11 +11,12 @@ public class XMIOperation {
     private OpTypes opType;
     private String shortName;
     private String visibility;
+    private Boolean hasShortName;
 
     public XMIOperation(Element aElement)
     {     
         String xmiName = (aElement.getAttribute("name"));
-
+        hasShortName = false;
         if (aElement.getAttribute("name").contains("«function»"))
         {
             this.opType = OpTypes.function;
@@ -23,7 +24,6 @@ public class XMIOperation {
         }	
         else
             this.opType = OpTypes.operation;
-        
         
         String seg1[] = xmiName.split("\\(");
         String opName = seg1[0];
@@ -40,12 +40,18 @@ public class XMIOperation {
         for(int n = 0; n < args.length; n++)     
         {
             if(args[n].contains("in ") || args[n].contains(" in "))
-            args[n] = args[n].replace("in ", "");
-            
+            {
+                args[n] = args[n].replace("in ", "");
+                hasShortName = true;
+            }
             String inSeg1[] = args[n].split(":");
-
-            shortnames[n] = inSeg1[0];
-
+            
+            if(hasShortName == true)
+                shortnames[n] = inSeg1[0];
+            else
+                shortnames[n] = "";
+            
+            hasShortName = false;
             args[n] = inSeg1[inSeg1.length - 1];
         }
         
@@ -72,7 +78,7 @@ public class XMIOperation {
         {
             newShortName = newShortName + ","  + shortnames[n];
         }
-        this.shortName = newShortName + ") ==" ;
+        this.shortName = newShortName + ") == ()" ;
     }
 
     private String remove(String s, String r)

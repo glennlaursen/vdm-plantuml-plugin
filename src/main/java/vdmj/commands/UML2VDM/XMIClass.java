@@ -12,8 +12,6 @@ import java.util.*;
 public class XMIClass {
 
     private String name;
-/*     private String ID;
-    private String visibility; */
     private String parent;
     private Boolean isInherited;
     private Boolean isAbstract;
@@ -80,8 +78,6 @@ public class XMIClass {
 
     public void addAssoc(XMIAttribute att)
     {
-        //possibly add type/value differenciation here  
-        
         if (att.getAttType() == AttTypes.type)
             typeList.add(att);
 

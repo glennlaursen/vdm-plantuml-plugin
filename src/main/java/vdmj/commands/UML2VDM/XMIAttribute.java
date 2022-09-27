@@ -29,11 +29,15 @@ public class XMIAttribute {
         this.isAbstract = false;
 
         if(aElement.getAttribute("isStatic").equals("true"))
+        {
             this.isStatic = true;
+        }
 
         if(aElement.getAttribute("isAbstract").equals("true"))
+        {
             this.isAbstract = true;
-
+        }
+            
         setAttType(aElement);
 
         this.visibility = visibility(aElement);
@@ -120,16 +124,16 @@ public class XMIAttribute {
 
     private void setAttType(Element aElement)
     {
-        if (aElement.getAttribute("name").contains("«value»"))
+        if (aElement.getAttribute("name").contains("«value»") || aElement.getAttribute("name").contains("value>>"))
         {
             this.attType = AttTypes.value;
-            this.name = remove(aElement.getAttribute("name"), "«value»");      
+            this.name = aElement.getAttribute("name").replace(" «value»", "");             
         }		
 
         else if (aElement.getAttribute("name").contains("«type»"))
         {
             this.attType = AttTypes.type;
-            this.name = remove(aElement.getAttribute("name"), "«type»");      
+            this.name = aElement.getAttribute("name").replace(" «type»", "");            
         }
         
         else
@@ -241,16 +245,25 @@ public class XMIAttribute {
             String abs = this.isAbstract ? "abstract " : "";
             String stat = this.isStatic ? "static " : "";
             String maptype = "";
+            String asoc = "";
 
             if(this.qualiType == QualiTypes.map)
                     maptype = "map ";
             if(this.qualiType == QualiTypes.inmap)
                     maptype = "inmap ";
 
-            String map = this.isQualified ? maptype + this.qualifier + " to " :  "";
-            String asoc = this.isAssociative ? getMulType() + this.relName : "";
+            String map = this.isQualified ? " : " + maptype + this.qualifier + " to " :  "";
+            
+            if(this.isAssociative)
+            {
+                if(!this.isQualified)
+                    asoc = " : " + getMulType() + this.relName;
+        
+                else
+                    asoc = getMulType() + this.relName;
+            }
 
-            return stat + abs + this.name + " : " + map + asoc + ";\n";
+            return stat + abs + this.name + map + asoc + ";\n";
         }
         
         else return "undef";

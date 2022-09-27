@@ -64,6 +64,7 @@ public class Uml2vdmCommand extends Command {
 			try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
 				source = br.lines().collect(Collectors.toList());
 			}
+
 			List<StringLocated> sourceLocated = convert(source);
 			PSystemBuilder pBuilder = new PSystemBuilder();
 			Diagram diagram = pBuilder.createPSystem(ThemeStyle.LIGHT_REGULAR, null, sourceLocated, null);
