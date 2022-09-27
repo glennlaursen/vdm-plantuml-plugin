@@ -51,11 +51,6 @@
 			<artifactId>plantuml</artifactId>
 			<version>1.2022.7</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>net.sourceforge.plantuml</groupId>
-			<artifactId>plantuml</artifactId>
-			<version>1.2022.8beta2-SNAPSHOT</version>
-		</dependency> -->
 	</dependencies>
 
 	<repositories>

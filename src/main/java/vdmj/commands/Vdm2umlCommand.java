@@ -1,6 +1,6 @@
 package vdmj.commands;
 
-import vdmj.commands.VDM2UML.Buffers;
+import vdmj.commands.VDM2UML.PlantBuilder;
 import vdmj.commands.VDM2UML.UMLGenerator;
 import workspace.PluginRegistry;
 import workspace.plugins.TCPlugin;
@@ -58,14 +58,14 @@ public class Vdm2umlCommand extends Command
 
 		TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList classes = tcPlugin.getTC();
-		Buffers buffers;
+		PlantBuilder pBuilder;
 		
 		if (!classes.isEmpty())
 		{
-			buffers = new Buffers(classes);
+			pBuilder = new PlantBuilder(classes);
 			for (TCClassDefinition cdef: classes)
 			{
-				cdef.apply(new UMLGenerator(), buffers);
+				cdef.apply(new UMLGenerator(), pBuilder);
 			}
 		}
 		else
@@ -75,7 +75,7 @@ public class Vdm2umlCommand extends Command
 		}
 		
 		buildBoiler();
-		if (!printPlantUML(buffers))
+		if (!printPlantUML(pBuilder))
 		{
 			return new DAPMessageList(request,
 				false, "Failed writing to output path", null);	
@@ -100,7 +100,7 @@ public class Vdm2umlCommand extends Command
 		return boiler;
 	}
 
-	public boolean printPlantUML(Buffers buffers)
+	public boolean printPlantUML(PlantBuilder pBuilder)
     {   
         try 
 		{
@@ -112,8 +112,8 @@ public class Vdm2umlCommand extends Command
 			FileWriter writer = new FileWriter(plantFile.getAbsolutePath());
 			
 			writer.write(boiler.toString());
-			writer.write(buffers.defs.toString());
-			writer.write(buffers.asocs.toString());
+			writer.write(pBuilder.defs.toString());
+			writer.write(pBuilder.asocs.toString());
 			writer.write("@enduml");
 			writer.close();
 
