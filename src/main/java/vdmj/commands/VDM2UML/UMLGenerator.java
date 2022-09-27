@@ -138,8 +138,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, PlantBuilder arg)
 	{
-		System.out.println("### Operation: " + node.name.getName());
-
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);

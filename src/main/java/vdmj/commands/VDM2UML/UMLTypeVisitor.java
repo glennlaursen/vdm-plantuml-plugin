@@ -25,7 +25,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	public List<Object> caseType(TCType node, UMLType arg)
 	{
 		arg.depth++;
-		if (node.isClass(arg.env))
+		if ((node.isClass(arg.env) && arg.depth < 4 && arg.isMap) || (node.isClass(arg.env) && arg.depth < 3))
 		{
 			arg.endClass = node.toString();
 			arg.isAsoc = true;
@@ -45,7 +45,6 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		}
 		else
 		{
-			System.out.println("##### Named Type: " + node.toString());
 			arg.inClassType += node.toString();
 		}
 
@@ -95,7 +94,6 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         setSeqConstructor("(*)", "seq of ", arg);
 
 		if (arg.depth < arg.maxDepth)
-			System.out.println("##### Seq of _: " + node.seqof.toString());
 			node.seqof.apply(new UMLTypeVisitor(), arg);
 		
 		return null;
