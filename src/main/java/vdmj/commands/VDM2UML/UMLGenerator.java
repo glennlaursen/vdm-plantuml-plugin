@@ -212,8 +212,13 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
-		arg.defs.append("): ");
-		arg.defs.append(umlType.returnType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
+		}
+		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 
 		return null;
