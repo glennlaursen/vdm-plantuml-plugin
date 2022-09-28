@@ -1,5 +1,6 @@
 package plugins;
 
+import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -56,6 +57,28 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 		{
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	@Override
+	public void setServerCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			JSONObject provider = experimental.get("translateProvider");
+			
+			if (provider != null)
+			{
+				JSONArray ids = provider.get("languageId");
+				
+				if (ids != null)
+				{
+					ids.add("vdm2uml");
+					ids.add("uml2vdm");
+				}
+			}
 		}
 	}
 
