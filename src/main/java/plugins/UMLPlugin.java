@@ -39,6 +39,10 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			{
 				return analyseUML2VDM(event.request);
 			}
+			else if (ute.languageId.equals("vdm2uml"))
+			{
+				return analyseVDM2UML(event.request);
+			}
 		}
 		
 		return null;	// Not handled
@@ -46,6 +50,21 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 
 	public RPCMessageList analyseUML2VDM(RPCRequest request)
+	{
+		try
+		{
+			JSONObject params = request.get("params");
+
+			return new RPCMessageList(request, new JSONObject("uri", params.toString()));
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList analyseVDM2UML(RPCRequest request)
 	{
 		try
 		{
