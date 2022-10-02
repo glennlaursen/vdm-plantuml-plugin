@@ -6,22 +6,24 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
+public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 {
 	@Override
-	public Object caseDefinition(TCDefinition node, Buffers arg)
+	public Object caseDefinition(TCDefinition node, PlantBuilder arg)
 	{
 		return null;
 	}
 
 	@Override
-	public Object caseClassDefinition(TCClassDefinition node, Buffers arg)
+	public Object caseClassDefinition(TCClassDefinition node, PlantBuilder arg)
 	{
 		arg.defs.append("class ");
 		arg.defs.append(node.name.getName());
@@ -37,10 +39,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseInstanceVariableDefinition(TCInstanceVariableDefinition node, Buffers arg)
+	public Object caseInstanceVariableDefinition(TCInstanceVariableDefinition node, PlantBuilder arg)
 	{	
 		TCType type = node.getType();
-		UMLType umlType = new UMLType(Buffers.env);
+		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
 
 		String visibility = visibility(node.accessSpecifier);
@@ -95,10 +97,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseTypeDefinition(TCTypeDefinition node, Buffers arg)
+	public Object caseTypeDefinition(TCTypeDefinition node, PlantBuilder arg)
 	{
 		TCType type = node.getType();
-		UMLType umlType = new UMLType(Buffers.env);
+		UMLType umlType = new UMLType(PlantBuilder.env, true);
 		type.apply(new UMLTypeVisitor(), umlType);
 
 		arg.defs.append("\t");
@@ -107,18 +109,18 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		arg.defs.append(": ");
 		arg.defs.append(umlType.inClassType);
 		arg.defs.append(" <<type>>");
-		arg.defs.append("\n");		
+		arg.defs.append("\n");
 
 		return null; 
 	}
 
 	@Override
-	public Object caseValueDefinition(TCValueDefinition node, Buffers arg)
+	public Object caseValueDefinition(TCValueDefinition node, PlantBuilder arg)
 	{
-		for (TCDefinition def: node.getDefinitions())
+		for (TCDefinition def : node.getDefinitions()) 
 		{
 			TCType type = def.getType();
-			UMLType umlType = new UMLType(Buffers.env);
+			UMLType umlType = new UMLType(PlantBuilder.env, false);
 			type.apply(new UMLTypeVisitor(), umlType);
 			
 			arg.defs.append("\t");
@@ -134,12 +136,19 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, Buffers arg)
+	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, PlantBuilder arg)
 	{
+		TCType type = node.getType();
+		UMLType umlType = new UMLType(PlantBuilder.env, false);
+		type.apply(new UMLTypeVisitor(), umlType);
+
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
-		arg.defs.append(getPlantArgs(node.getType().toString()));
+		arg.defs.append("(");
+		arg.defs.append(umlType.paramsType);
+		arg.defs.append("): ");
+		arg.defs.append(umlType.returnType);
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 
@@ -147,43 +156,70 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 	}
 	
 	@Override
-	public Object caseExplicitOperationDefinition(TCExplicitOperationDefinition node, Buffers arg)
+	public Object caseExplicitOperationDefinition(TCExplicitOperationDefinition node, PlantBuilder arg)
 	{	
+		TCType type = node.getType();
+		UMLType umlType = new UMLType(PlantBuilder.env, false);
+		type.apply(new UMLTypeVisitor(), umlType);
+
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
-		arg.defs.append(" ");
 		arg.defs.append(node.name.getName());
-		arg.defs.append(getPlantArgs(node.getType().toString()));
+		arg.defs.append("(");
+		arg.defs.append(umlType.paramsType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
+		}
 		arg.defs.append("\n");
 
 		return null;
 	}
 
+	public Object caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, PlantBuilder arg) {
+		TCType type = node.getType();
+		UMLType umlType = new UMLType(PlantBuilder.env, false);
+		type.apply(new UMLTypeVisitor(), umlType);
 
-	private String getPlantArgs(String args)
-	{
-		String str0 = removeBrackets(args);
-		String splitter = "";
-		if (str0.contains("->"))
-			splitter = " ->";
-
-		if (str0.contains("==>"))
-			splitter = " ==>";
-		
-		String seg1[] = str0.split(splitter);
-		String out = seg1[seg1.length - 1];
-		String vdmArgLine = seg1[0];
-
-		if(args.contains("*"))
+		arg.defs.append("\t");
+		arg.defs.append(visibility(node.accessSpecifier));
+		arg.defs.append(node.name.getName());
+		arg.defs.append("(");
+		arg.defs.append(umlType.paramsType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
 		{
-			String seg2[] = seg1[0].split(" \\* "); 
-			vdmArgLine = seg2[0];
-			for(int n = 1 ; n < seg2.length ; n++)
-			{
-				vdmArgLine = vdmArgLine + ", " + seg2[n];            
-			} 
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
 		}
-		return "(" + vdmArgLine + ")" + ":" + out; 
+		arg.defs.append(" <<function>>");
+		arg.defs.append("\n");
+
+		return null;
+	}
+	  
+	public Object caseImplicitOperationDefinition(TCImplicitOperationDefinition node, PlantBuilder arg) {
+		TCType type = node.getType();
+		UMLType umlType = new UMLType(PlantBuilder.env, false);
+		type.apply(new UMLTypeVisitor(), umlType);
+
+		arg.defs.append("\t");
+		arg.defs.append(visibility(node.accessSpecifier));
+		arg.defs.append(node.name.getName());
+		arg.defs.append("(");
+		arg.defs.append(umlType.paramsType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(": ");
+			arg.defs.append(umlType.returnType);
+		}
+		arg.defs.append(" <<function>>");
+		arg.defs.append("\n");
+
+		return null;
 	}
 
 	private String visibility(TCAccessSpecifier access)
@@ -197,21 +233,24 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, Buffers>
 		else if (access.access == Token.PROTECTED)
 			res += "#";
 		
-		if (access.isStatic)
-			res += "{static}";
-		
 		return res;
 	}
 
-	private String removeBrackets(String str)
+	static public StringBuilder buildBoiler() 
 	{
-		if (str.contains("("))
-			str = str.replace("(", "");
-		
-		if (str.contains(")"))
-			str = str.replace(")", "");
+		StringBuilder boiler = new StringBuilder();
 
-		return str;
+		boiler.append("@startuml\n\n");
+		boiler.append("hide empty members\n");
+		boiler.append("skinparam Shadowing false\n");
+		boiler.append("skinparam classAttributeIconSize 0\n");
+		boiler.append("skinparam ClassBorderThickness 0.5\n");
+		boiler.append("skinparam class {\n");
+		boiler.append("\tBackgroundColor AntiqueWhite\n");
+		boiler.append("\tArrowColor Black\n");
+		boiler.append("\tBorderColor Black\n}\n");
+		boiler.append("skinparam defaultTextAlignment center\n\n");
+
+		return boiler;
 	}
-}	
-
+}

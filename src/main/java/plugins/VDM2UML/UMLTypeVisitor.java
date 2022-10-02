@@ -3,8 +3,11 @@ package plugins.VDM2UML;
 import java.util.Vector;
 import java.util.List;
 
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -22,14 +25,29 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	public List<Object> caseType(TCType node, UMLType arg)
 	{
 		arg.depth++;
-		if (node.isClass(arg.env))
+		if ((node.isClass(arg.env) && arg.depth < 4 && arg.isMap) || (node.isClass(arg.env) && arg.depth < 3))
 		{
 			arg.endClass = node.toString();
 			arg.isAsoc = true;
-		} 
-		else if (!arg.isMap)
+		}
+		if (!arg.isMap)
 			arg.inClassType += node.toString();
 		
+		return null;
+	}
+
+	@Override
+	public List<Object> caseNamedType(TCNamedType node, UMLType arg)
+	{
+		if (arg.isType) 
+		{
+			node.type.apply(new UMLTypeVisitor(), arg);
+		}
+		else
+		{
+			arg.inClassType += node.toString();
+		}
+
 		return null;
 	}
 
@@ -83,7 +101,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 	private void setSeqConstructor(String _multiplicity, String _type, UMLType arg)
 	{
-		if (arg.depth < arg.maxDepth - 1)
+		if (arg.depth < 2)
 			arg.multiplicity += _multiplicity;
 		
 		if (!arg.isMap && !arg.inClassType.contains("map"))
@@ -99,7 +117,8 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		if (arg.depth > 2)
 			return null;
 		
-		if (arg.depth < arg.maxDepth - 1)
+		if (arg.depth < 2)
+		{
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
 			{
@@ -107,6 +126,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 				arg.qualifier += node.from.toString();
 				arg.qualifier += ")";
 			}
+		}
 		node.to.apply(new UMLTypeVisitor(), arg);
 
 		return null;
@@ -121,7 +141,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		if (arg.depth > 2)
 			return null;
 		
-		if (arg.depth < arg.maxDepth - 1)
+		if (arg.depth < 2)
 			arg.isMap = true;
 			if (!node.from.isClass(arg.env))
 				arg.qualifier += node.from.toString();
@@ -137,8 +157,15 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         /** Set type to * */
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
-		for (int i = 0; i < node.types.size()-1; i++)
-			arg.inClassType += "*";
+		{
+			for (int i = 0; i < node.types.size() - 1; i++)
+				if (i > node.types.size() - 1)
+				{
+					arg.inClassType += "...";
+					return null;
+				}
+				arg.inClassType += "*";
+		}
 		
 		return null;
 	}
@@ -149,9 +176,16 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
         /** Set type to | */
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
-			for (int i = 0; i < node.types.size()-1; i++)
+		{		
+			for (int i = 0; i < node.types.size() - 1; i++)
+				if (i > node.types.size() - 1)
+				{
+					arg.inClassType += "...";
+					return null;
+				}
 				arg.inClassType += "|";
-		
+		}
+
 		return null;
 	}
 
@@ -162,6 +196,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.depth++;
 		if (arg.depth < arg.maxDepth && !arg.isMap)
 			arg.inClassType += "[]";
+
 		return null;
 	}
 
@@ -176,11 +211,62 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		return null;
 	}
 
-	private boolean isBasicType(TCType type) 
+	@Override
+	public List<Object> caseOperationType(TCOperationType node, UMLType arg)
 	{
+		int i = 0;
+		for (TCType param : node.parameters)
+		{
+			UMLType paramUMLType = new UMLType(arg.env, false);
+			param.apply(new UMLTypeVisitor(), paramUMLType);
+			arg.paramsType += paramUMLType.inClassType;
+			
+			// Remove whitespace at end of parameter
+			if (arg.paramsType.length() > 1)
+			{
+				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
+				{
+					arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
+				}
+			}
+			if (i < node.parameters.size() - 1)
+				arg.paramsType += ", ";
+			i += 1;
+		}
+		UMLType returnUMLType = new UMLType(arg.env, false);
+		node.result.apply(new UMLTypeVisitor(), returnUMLType);
+		arg.returnType = returnUMLType.inClassType;
 		
+		return null;
+	}
 
-		return true;
+	@Override
+	public List<Object> caseFunctionType(TCFunctionType node, UMLType arg)
+	{
+		int i = 0;
+		for (TCType param : node.parameters)
+		{
+			UMLType paramUMLType = new UMLType(arg.env, false);
+			param.apply(new UMLTypeVisitor(), paramUMLType);
+			arg.paramsType += paramUMLType.inClassType;
+
+			// Remove whitespace at end of parameter
+			if (arg.paramsType.length() > 1)
+			{
+				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
+				{
+					arg.paramsType = arg.paramsType.substring(0, arg.paramsType.length() - 1);
+				}
+			}
+			if (i < node.parameters.size() - 1)
+				arg.paramsType += ", ";
+			i += 1;
+		}
+		UMLType returnUMLType = new UMLType(arg.env, false);
+		node.result.apply(new UMLTypeVisitor(), returnUMLType);
+		arg.returnType = returnUMLType.inClassType;
+		
+		return null;
 	}
 
 	@Override
@@ -189,4 +275,3 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		return new Vector<Object>();
 	}
 }
-

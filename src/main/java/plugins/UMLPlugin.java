@@ -1,16 +1,29 @@
 package plugins;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.PrintWriter;
+import java.net.URI;
+
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
+import plugins.VDM2UML.PlantBuilder;
+import plugins.VDM2UML.UMLGenerator;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
+import workspace.PluginRegistry;
 import workspace.events.LSPEvent;
 import workspace.events.UnknownTranslationEvent;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.TCPlugin;
 
 public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
@@ -69,8 +82,40 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 		try
 		{
 			JSONObject params = request.get("params");
+			File saveUri = Utils.uriToFile(params.get("saveUri"));
+			String rootUri = params.get("uri").toString();
+			
+			TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
+			TCClassList classes = tcPlugin.getTC();
 
-			return new RPCMessageList(request, new JSONObject("uri", params.toString()));
+			if (classes == null || classes.isEmpty())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "No classes were found");
+			}
+
+			PlantBuilder pBuilder = new PlantBuilder(classes);
+			for (TCClassDefinition cdef: classes)
+			{
+				cdef.apply(new UMLGenerator(), pBuilder);
+			}
+
+			StringBuilder boiler = UMLGenerator.buildBoiler();
+
+			String projectName = rootUri.substring(rootUri.lastIndexOf('/') + 1);
+			
+			File outfile = new File(saveUri, projectName + ".puml");
+			PrintWriter out = new PrintWriter(outfile);
+			try (BufferedWriter writer = new BufferedWriter(out)) 
+			{
+				writer.append(boiler);
+				writer.append(pBuilder.defs);
+				writer.append(pBuilder.asocs);
+				writer.append("\n");
+				writer.append("@enduml");
+			}
+			out.close();
+
+			return new RPCMessageList(request, new JSONObject("uri", saveUri.toURI().toString()));
 		}
 		catch (Exception e)
 		{
@@ -100,5 +145,4 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 		}
 	}
-
 }
