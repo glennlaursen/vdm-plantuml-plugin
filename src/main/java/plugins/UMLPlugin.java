@@ -107,8 +107,11 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 
 			PlantBuilder pBuilder = new PlantBuilder(classes);
+			String fileName = "";
 
 			if (isProject) {
+				String projectName = Path.of(uri).getFileName().toString();
+				fileName = projectName;
 				for (TCClassDefinition cdef: classes)
 				{
 					cdef.apply(new UMLGenerator(), pBuilder);
@@ -116,20 +119,23 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 			else
 			{
-				String cname = Path.of(uri).getFileName().toString();
+				String className = Path.of(uri).getFileName().toString();
+				className = className.substring(0, className.lastIndexOf('.'));
+				fileName = className;
 				for (TCClassDefinition cdef: classes)
 				{
-					cdef.apply(new UMLGenerator(), pBuilder);
+					String cdefName = cdef.toString();
+					cdefName = cdefName.substring(cdefName.indexOf(" ")+1, cdefName.indexOf("\n"));
+					if (cdefName.equalsIgnoreCase(className))
+					{
+						cdef.apply(new UMLGenerator(), pBuilder);
+					}
 				}
 			}
 
 			StringBuilder boiler = UMLGenerator.buildBoiler();
-
-			String path = uri.toString();
-			String projectName = path.substring(path.lastIndexOf('/') + 1);
 			
-			File outfile = new File(saveUri, projectName + ".puml");
-			System.out.print(projectName);
+			File outfile = new File(saveUri, fileName + ".puml");
 			PrintWriter out = new PrintWriter(outfile);
 			try (BufferedWriter writer = new BufferedWriter(out)) 
 			{
