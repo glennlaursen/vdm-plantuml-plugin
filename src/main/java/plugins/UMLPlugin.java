@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -79,11 +81,19 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 	public RPCMessageList analyseVDM2UML(RPCRequest request)
 	{
+		boolean isProject = false;
 		try
 		{
 			JSONObject params = request.get("params");
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
-			String rootUri = params.get("uri").toString();
+			URI uri = params.get("uri");
+			String rootUri = uri.toString();
+
+			if(uri != null){
+				isProject = Files.isDirectory(Path.of(uri));
+			}
+				
+
 			
 			TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
 			TCClassList classes = tcPlugin.getTC();
@@ -94,9 +104,19 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 
 			PlantBuilder pBuilder = new PlantBuilder(classes);
-			for (TCClassDefinition cdef: classes)
-			{
-				cdef.apply(new UMLGenerator(), pBuilder);
+
+			if(isProject){
+				for (TCClassDefinition cdef: classes)
+				{
+					cdef.apply(new UMLGenerator(), pBuilder);
+				}
+			}else{
+				String cname = Path.of(uri).getFileName().toString();
+				for (TCClassDefinition cdef: classes)
+				{
+					cdef.apply(new UMLGenerator(), pBuilder);
+				}
+				
 			}
 
 			StringBuilder boiler = UMLGenerator.buildBoiler();
