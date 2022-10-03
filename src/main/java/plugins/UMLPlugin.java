@@ -78,7 +78,6 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 			return new RPCMessageList(request, new JSONObject("uri", saveUri.toURI().toString()));
 		}
-		
 		catch (Exception e)
 		{
 			Diag.error(e);
@@ -93,14 +92,11 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 		{
 			JSONObject params = request.get("params");
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
-			URI uri = params.get("uri");
-			String rootUri = uri.toString();
+			URI uri = URI.create(params.get("uri"));
 
-			if(uri != null){
+			if (uri != null) {
 				isProject = Files.isDirectory(Path.of(uri));
 			}
-				
-
 			
 			TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
 			TCClassList classes = tcPlugin.getTC();
@@ -112,25 +108,28 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 			PlantBuilder pBuilder = new PlantBuilder(classes);
 
-			if(isProject){
+			if (isProject) {
 				for (TCClassDefinition cdef: classes)
 				{
 					cdef.apply(new UMLGenerator(), pBuilder);
 				}
-			}else{
+			}
+			else
+			{
 				String cname = Path.of(uri).getFileName().toString();
 				for (TCClassDefinition cdef: classes)
 				{
 					cdef.apply(new UMLGenerator(), pBuilder);
 				}
-				
 			}
 
 			StringBuilder boiler = UMLGenerator.buildBoiler();
 
-			String projectName = rootUri.substring(rootUri.lastIndexOf('/') + 1);
+			String path = uri.toString();
+			String projectName = path.substring(path.lastIndexOf('/') + 1);
 			
 			File outfile = new File(saveUri, projectName + ".puml");
+			System.out.print(projectName);
 			PrintWriter out = new PrintWriter(outfile);
 			try (BufferedWriter writer = new BufferedWriter(out)) 
 			{
