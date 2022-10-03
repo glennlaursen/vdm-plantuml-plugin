@@ -13,6 +13,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import plugins.UML2VDM.Uml2vdmMain;
 import plugins.VDM2UML.PlantBuilder;
 import plugins.VDM2UML.UMLGenerator;
 import rpc.RPCErrors;
@@ -70,8 +71,14 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 		{
 			JSONObject params = request.get("params");
 
-			return new RPCMessageList(request, new JSONObject("uri", params.toString()));
+			File uri = Utils.uriToFile(params.get("uri"));
+			File saveUri = Utils.uriToFile(params.get("saveUri"));
+			Uml2vdmMain puml = new Uml2vdmMain(uri, saveUri);
+			puml.run();
+
+			return new RPCMessageList(request, new JSONObject("uri", saveUri.toURI().toString()));
 		}
+		
 		catch (Exception e)
 		{
 			Diag.error(e);
