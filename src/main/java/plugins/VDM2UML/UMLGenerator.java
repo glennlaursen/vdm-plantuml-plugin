@@ -1,4 +1,4 @@
-package vdmj.commands.VDM2UML;
+package plugins.VDM2UML;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
@@ -234,5 +234,23 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			res += "#";
 		
 		return res;
+	}
+
+	static public StringBuilder buildBoiler() 
+	{
+		StringBuilder boiler = new StringBuilder();
+
+		boiler.append("@startuml\n\n");
+		boiler.append("hide empty members\n");
+		boiler.append("skinparam Shadowing false\n");
+		boiler.append("skinparam classAttributeIconSize 0\n");
+		boiler.append("skinparam ClassBorderThickness 0.5\n");
+		boiler.append("skinparam class {\n");
+		boiler.append("\tBackgroundColor AntiqueWhite\n");
+		boiler.append("\tArrowColor Black\n");
+		boiler.append("\tBorderColor Black\n}\n");
+		boiler.append("skinparam defaultTextAlignment center\n\n");
+
+		return boiler;
 	}
 }

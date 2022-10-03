@@ -1,10 +1,10 @@
-package vdmj.commands.UML2VDM;
+package plugins.UML2VDM;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import vdmj.commands.UML2VDM.XMIAttribute.AttTypes;
-import vdmj.commands.UML2VDM.XMIOperation.OpTypes;
+import plugins.UML2VDM.XMIAttribute.AttTypes;
+import plugins.UML2VDM.XMIOperation.OpTypes;
 
 import java.util.*;
 

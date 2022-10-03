@@ -1,4 +1,4 @@
-package vdmj.commands.VDM2UML;
+package plugins.VDM2UML;
 
 import java.util.Vector;
 import java.util.List;
@@ -275,4 +275,3 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		return new Vector<Object>();
 	}
 }
-

@@ -1,4 +1,4 @@
-package vdmj.commands;
+package plugins.UML2VDM;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -17,11 +17,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import vdmj.commands.UML2VDM.VDMPrinter;
-import vdmj.commands.UML2VDM.XMIAttribute;
-import vdmj.commands.UML2VDM.XMIClass;
 import net.sourceforge.plantuml.LineLocationImpl;
 import net.sourceforge.plantuml.PSystemBuilder;
 import net.sourceforge.plantuml.StringLocated;
@@ -30,38 +25,28 @@ import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.xmi.XmiClassDiagramStar;
 
-public class Uml2vdmCommand extends Command {
+public class Uml2vdmMain {
     
     private Hashtable<String, XMIClass> cHash = new Hashtable<String, XMIClass>(); 
 	private List<XMIClass> classList = new ArrayList<XMIClass>();  
-	public static final String USAGE = "Usage: uml2vdm <file>";
-	public static final String[] HELP = { "uml2vdm", "uml2vdm <file> - translate PlantUML model to VDM++" };
-	
-	String path;
 
-	public Uml2vdmCommand(String line)
+	File pumlFile;
+	File outputDir;
+
+	public Uml2vdmMain(File inputfile, File output)
 	{
-		String[] parts = line.split("\\s+", 2);
-		
-		if (parts.length == 2)
-		{
-			this.path = parts[1];
-		}
-		else
-		{
-			throw new IllegalArgumentException(USAGE);
-		}
+		this.pumlFile = inputfile;
+		this.outputDir = output;
+
 	}
 
-	@Override
-	public DAPMessageList run(DAPRequest request)
+	public String run()
 	{
 		try 
 		{
-			File inputFile = new File(path);
 			List<String> source = new ArrayList<>();
 			
-			try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+			try (BufferedReader br = new BufferedReader(new FileReader(pumlFile))) {
 				source = br.lines().collect(Collectors.toList());
 			}
 
@@ -90,14 +75,14 @@ public class Uml2vdmCommand extends Command {
 			addAssociations(rList); 
 
 			VDMPrinter printer = new VDMPrinter(classList);
-			printer.printVDM(path.replace(inputFile.getName(), ""));
+			printer.printVDM(outputDir);
 		
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new DAPMessageList();
+		return "";
 	}
 
 	public static List<StringLocated> convert(List<String> strings) {
@@ -164,9 +149,4 @@ public class Uml2vdmCommand extends Command {
 		}
 	}
 
-	@Override
-	public boolean notWhenRunning()
-	{
-		return true;
-	}
 }

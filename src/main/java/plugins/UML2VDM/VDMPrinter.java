@@ -1,4 +1,4 @@
-package vdmj.commands.UML2VDM;
+package plugins.UML2VDM;
 
 import java.util.*;
 
@@ -15,18 +15,19 @@ public class VDMPrinter {
         this.classList = classList;
     }
 
-    public void printVDM(String path)
+    public void printVDM(File path)
     {   
         try {
-            new File("generated").mkdirs();
 
             for (int n = 0; n < classList.size(); n++) 
             {	
                 XMIClass c = classList.get(n);
                 
-                File vdmFile = new File("generated/" + c.getName() + ".vdmpp");
+                //File vdmFile = new File(path.getAbsolutePath() + "/" + c.getName() + ".vdmpp");
                 
-               vdmFile.createNewFile();
+                File vdmFile = new File(path, c.getName() + ".vdmpp");
+
+                vdmFile.createNewFile();
                     
                 FileWriter writer = new FileWriter(vdmFile.getAbsolutePath());
                 
@@ -39,7 +40,7 @@ public class VDMPrinter {
                 writer.close();
             }
 
-            System.out.println("generated vdm files");
+            //System.out.println("generated vdm files");
 
         } catch (IOException e) {
             e.printStackTrace();

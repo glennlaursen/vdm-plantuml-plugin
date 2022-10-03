@@ -1,4 +1,4 @@
-package vdmj.commands.VDM2UML;
+package plugins.VDM2UML;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
