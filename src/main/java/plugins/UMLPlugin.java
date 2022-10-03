@@ -126,10 +126,8 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 				{
 					String cdefName = cdef.toString();
 					cdefName = cdefName.substring(cdefName.indexOf(" ")+1, cdefName.indexOf("\n"));
-					System.out.println("Sought class: " + className + ", Found class: " + cdefName + ", equals? " + cdefName.equalsIgnoreCase(className));
 					if (cdefName.equalsIgnoreCase(className))
 					{
-						System.out.println("Apply to " + className);
 						cdef.apply(new UMLGenerator(), pBuilder);
 					}
 				}
@@ -138,7 +136,6 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			StringBuilder boiler = UMLGenerator.buildBoiler();
 			
 			File outfile = new File(saveUri, fileName + ".puml");
-			System.out.print(fileName);
 			PrintWriter out = new PrintWriter(outfile);
 			try (BufferedWriter writer = new BufferedWriter(out)) 
 			{
