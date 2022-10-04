@@ -55,10 +55,10 @@ public class XMIOperation {
         String opOut = seg3[seg3.length - 1];
 
         if(this.opType == OpTypes.operation)
-            this.signature = opName + ":" + readyArgLine + " ==>" + opOut; 
+            this.signature = opName + " : " + readyArgLine + " ==>" + opOut; 
 
         else
-            this.signature = opName + ":" + readyArgLine + " ->" + opOut;
+            this.signature = opName + " : " + readyArgLine + " ->" + opOut;
         
         this.visibility = visibility(aElement);
     

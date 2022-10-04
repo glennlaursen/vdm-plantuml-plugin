@@ -140,7 +140,7 @@ public class XMIClass {
     {
         String abs = this.isAbstract ? "abstract " : "";
 
-        String inh = this.isInherited ? " is subclas of " + this.parent : "";
+        String inh = this.isInherited ? " is subclass of " + this.parent : "";
 
         return abs + "class " + this.name + inh + "\n\n";   
     }
