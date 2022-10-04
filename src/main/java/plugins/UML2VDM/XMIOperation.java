@@ -51,8 +51,16 @@ public class XMIOperation {
             readyArgLine = "";
         }
 
-        String seg3[] =  xmiName.split(":");
-        String opOut = seg3[seg3.length - 1];
+
+        String opOut;
+        if (xmiName.contains(":"))
+        {
+            String seg3[] =  xmiName.split(":");
+            opOut = seg3[seg3.length - 1];
+        }
+        else 
+            opOut = "";
+
 
         if(this.opType == OpTypes.operation)
             this.signature = opName + " : " + readyArgLine + " ==>" + opOut; 
