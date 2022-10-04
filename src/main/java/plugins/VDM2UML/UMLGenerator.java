@@ -159,7 +159,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
 		arg.defs.append(")");
-		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
@@ -183,7 +183,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
 		arg.defs.append(")");
-		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
@@ -204,7 +204,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
 		arg.defs.append(")");
-		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
@@ -226,7 +226,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
 		arg.defs.append(")");
-		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
