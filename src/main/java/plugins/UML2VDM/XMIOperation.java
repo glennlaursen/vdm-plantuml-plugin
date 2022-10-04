@@ -12,11 +12,13 @@ public class XMIOperation {
     private String shortName;
     private String visibility;
     private Boolean hasShortName;
+    private String[] args;
 
     public XMIOperation(Element aElement)
     {     
         String xmiName = (aElement.getAttribute("name"));
         hasShortName = false;
+        
         if (aElement.getAttribute("name").contains("«function»"))
         {
             this.opType = OpTypes.function;
@@ -24,61 +26,95 @@ public class XMIOperation {
         }	
         else
             this.opType = OpTypes.operation;
-        
+
         String seg1[] = xmiName.split("\\(");
         String opName = seg1[0];
+        String parameters[] = (seg1[seg1.length - 1]).split("\\)");
+        String readyArgLine;
 
-        String seg2[] = (seg1[seg1.length - 1]).split("\\)");
-        
-        String argLine = seg2[0];
-
-        String args[] = argLine.split(",");
-
-        String [ ] shortnames = new String [args.length];
-
-
-        for(int n = 0; n < args.length; n++)     
+        if(!(parameters.length == 0))
         {
-            if(args[n].contains("in ") || args[n].contains(" in "))
+            String[] abreviated = shortNames(parameters);   
+            readyArgLine = vdmArgline();
+
+            String newShortName = opName + "(" + abreviated[0];
+            for(int n = 1; n < abreviated.length ; n++)
             {
-                args[n] = args[n].replace("in ", "");
-                hasShortName = true;
+                newShortName = newShortName + ","  + abreviated[n];
             }
-            String inSeg1[] = args[n].split(":");
-            
-            if(hasShortName == true)
-                shortnames[n] = inSeg1[0];
-            else
-                shortnames[n] = "";
-            
-            hasShortName = false;
-            args[n] = inSeg1[inSeg1.length - 1];
-        }
-        
-        String vdmArgLine = args[0];
-        for(int n = 1 ; n < args.length ; n++)
+            this.shortName = newShortName + ") == ()" ;
+        } 
+
+        else 
         {
-            vdmArgLine = vdmArgLine + " *" + args[n];            
+            this.shortName = opName + "() == ()";
+            readyArgLine = "";
         }
 
         String seg3[] =  xmiName.split(":");
         String opOut = seg3[seg3.length - 1];
 
         if(this.opType == OpTypes.operation)
-            this.signature = opName + ":" + vdmArgLine + " ==>" + opOut; 
+            this.signature = opName + ":" + readyArgLine + " ==>" + opOut; 
 
         else
-            this.signature = opName + ":" + vdmArgLine + " ->" + opOut;
+            this.signature = opName + ":" + readyArgLine + " ->" + opOut;
         
         this.visibility = visibility(aElement);
-        
+    
+    }
 
-        String newShortName = opName + "(" + shortnames[0];
-        for(int n = 1; n < shortnames.length ; n++)
+    private String vdmArgline()
+    {
+        if (!(args == null))
         {
-            newShortName = newShortName + ","  + shortnames[n];
+            String vdmArgLine = args[0];
+            
+            for(int n = 1 ; n < args.length ; n++)
+            {
+                vdmArgLine = vdmArgLine + " *" + args[n];            
+            }
+            return vdmArgLine;
         }
-        this.shortName = newShortName + ") == ()" ;
+        else return "";
+    }
+
+    private String[] shortNames(String[] s)
+    {
+        if ((!(s.length == 0)))
+        {
+           
+            String argLine = s[0];
+            args = argLine.split(",");
+
+            String [] shortnames = new String[args.length];
+
+            for(int n = 0; n < args.length; n++)     
+            {
+                if(args[n].contains("in ") || args[n].contains(" in "))
+                {
+                    args[n] = args[n].replace("in ", "");
+                    hasShortName = true;
+                }
+                String inSeg1[] = args[n].split(":");
+                
+                if(hasShortName == true)
+                    shortnames[n] = inSeg1[0];
+                else
+                    shortnames[n] = "";
+                
+                hasShortName = false;
+                
+                if (!(inSeg1.length == 0))
+                    args[n] = inSeg1[inSeg1.length - 1];
+                
+            }
+           
+            return shortnames;
+        }
+
+        else return new String[0];
+
     }
 
     private String remove(String s, String r)
@@ -112,7 +148,7 @@ public class XMIOperation {
 
     public String getShortName()
     {
-        return shortName;
+        return this.shortName;
     }
 
     public OpTypes getOpType()
