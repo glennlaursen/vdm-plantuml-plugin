@@ -59,7 +59,7 @@ public class XMIOperation {
             opOut = seg3[seg3.length - 1];
         }
         else 
-            opOut = "";
+            opOut = " ()";
 
 
         if(this.opType == OpTypes.operation)
