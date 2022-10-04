@@ -34,6 +34,17 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			def.apply(this, arg);
 		}
 
+		/**
+		 * Create association to superclass if class is subclass
+		 */
+		for (TCType inheritedClass : node.supertypes)
+		{
+			arg.asocs.append(inheritedClass.toString());
+			arg.asocs.append(" <|-- ");
+			arg.asocs.append(node.name.getName());
+			arg.asocs.append("\n");
+		}
+
 		arg.defs.append("}\n\n");
 		return null;
 	}
@@ -89,7 +100,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			{
 				arg.defs.append(visibility);
 			}
-			arg.defs.append(varName + ": " + umlType.inClassType);
+			arg.defs.append(varName + " : " + umlType.inClassType);
 			arg.defs.append("\n");
 		}
 		
@@ -106,7 +117,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append("\t");
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
-		arg.defs.append(": ");
+		arg.defs.append(" : ");
 		arg.defs.append(umlType.inClassType);
 		arg.defs.append(" <<type>>");
 		arg.defs.append("\n");
@@ -126,7 +137,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			arg.defs.append("\t");
 			arg.defs.append(visibility(def.accessSpecifier));
 			arg.defs.append(def.name.getName());
-			arg.defs.append(": ");
+			arg.defs.append(" : ");
 			arg.defs.append(umlType.inClassType);
 			arg.defs.append(" <<value>>");
 			arg.defs.append("\n");
@@ -147,8 +158,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
 		arg.defs.append(umlType.paramsType);
-		arg.defs.append("): ");
-		arg.defs.append(umlType.returnType);
+		arg.defs.append(")");
+		if (!(umlType.returnType == "" || umlType.returnType == "()"))
+		{
+			arg.defs.append(" : ");
+			arg.defs.append(umlType.returnType);
+		}
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
 
@@ -170,7 +185,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(")");
 		if (!(umlType.returnType == "" || umlType.returnType == "()"))
 		{
-			arg.defs.append(": ");
+			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
 		}
 		arg.defs.append("\n");
@@ -191,7 +206,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(")");
 		if (!(umlType.returnType == "" || umlType.returnType == "()"))
 		{
-			arg.defs.append(": ");
+			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
 		}
 		arg.defs.append(" <<function>>");
@@ -213,7 +228,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(")");
 		if (!(umlType.returnType == "" || umlType.returnType == "()"))
 		{
-			arg.defs.append(": ");
+			arg.defs.append(" : ");
 			arg.defs.append(umlType.returnType);
 		}
 		arg.defs.append(" <<function>>");
@@ -245,6 +260,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		boiler.append("skinparam Shadowing false\n");
 		boiler.append("skinparam classAttributeIconSize 0\n");
 		boiler.append("skinparam ClassBorderThickness 0.5\n");
+		boiler.append("skinparam groupInheritance 3\n");
 		boiler.append("skinparam class {\n");
 		boiler.append("\tBackgroundColor AntiqueWhite\n");
 		boiler.append("\tArrowColor Black\n");
