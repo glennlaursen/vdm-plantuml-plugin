@@ -40,15 +40,13 @@
 			<groupId>dk.au.ece.vdmj</groupId>
      		<artifactId>lsp</artifactId>
     		<version>4.5.0-SNAPSHOT</version>
-			<scope>system</scope>
-    		<systemPath>${project.basedir}/src/lib/lsp-4.5.0-SNAPSHOT.jar</systemPath>
+			<scope>provided</scope>
    		</dependency>
    		<dependency>
      		<groupId>dk.au.ece.vdmj</groupId>
      		<artifactId>vdmj</artifactId>
     		<version>4.5.0-SNAPSHOT</version>
-			<scope>system</scope>
-    		<systemPath>${project.basedir}/src/lib/vdmj-4.5.0-SNAPSHOT.jar</systemPath>
+			<scope>provided</scope>
    		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.plantuml</groupId>
@@ -57,12 +55,6 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>repo</id>
-			<url>file://${project.basedir}/repo</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>
@@ -79,25 +71,22 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-							<excludeArtifactIds>lsp,vdmj</excludeArtifactIds>
-							<outputDirectory>${project.build.directory}/lib/</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+				  <descriptorRefs>
+					<descriptorRef>jar-with-dependencies</descriptorRef>
+				  </descriptorRefs>
+				</configuration>
+				<executions>
+				  <execution>
+					<id>make-assembly</id> <!-- this is used for inheritance merges -->
+					<phase>package</phase> <!-- bind to the packaging phase -->
+					<goals>
+					  <goal>single</goal>
+					</goals>
+				  </execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
