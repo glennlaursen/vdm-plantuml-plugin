@@ -260,6 +260,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		boiler.append("skinparam Shadowing false\n");
 		boiler.append("skinparam classAttributeIconSize 0\n");
 		boiler.append("skinparam ClassBorderThickness 0.5\n");
+		boiler.append("skinparam groupInheritance 5\n");
 		boiler.append("skinparam class {\n");
 		boiler.append("\tBackgroundColor AntiqueWhite\n");
 		boiler.append("\tArrowColor Black\n");
