@@ -1,42 +1,7 @@
 
 
 
-```
-Syntax:    
-     
-    type = association type
 
-    association type = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable    
-``` 
-
-Where `class` is the identifier of the associating object, `class'` is the identifier of the associated object and `variable` is the identifier of the instance variable that is defined by the association.
-
-
-``` 
-
-    qualificaition = general map type
-                   | injective map type
-    
-    general map type = ‘"[’ type ‘]"’ 
-    injective map type = ‘"[(’ type ‘)]"’ 
-    
-    
-    multiplicity = set type
-                 | seq type
-    
-    set type = set0 type
-             | set1 type
-             
-    set0 type = "*"
-    set1 type = "1..*"
-    
-    set type = seq0 type
-             | seq1 type
-    
-    set0 type = "(*)"
-    set1 type = "(1..*)"
-    
-``` 
 
 ## Bi-directional mapping:
 
@@ -61,7 +26,42 @@ If the type of the elements in a set is any other type, including a compound typ
 
 #### Associative sets and sequences:
 	
-	
+```
+Syntax:    
+     
+    type = association type
+
+    association type = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable    
+``` 
+
+Where `class` is the identifier of the associating object, `class'` is the identifier of the associated object and `variable` is the identifier of the instance variable that is defined by the association.
+
+
+``` 
+
+    qualificaition = general map type
+                   | injective map type
+    
+    	general map type = ‘"[’ type ‘]"’ 
+    	injective map type = ‘"[(’ type ‘)]"’ 
+    
+    
+    multiplicity = set type
+                 | seq type
+    
+    	set type = set0 type
+             	 | set1 type
+             
+    		set0 type = "*"
+    		set1 type = "1..*"
+    
+    	seq type = seq0 type
+             	 | seq1 type
+    
+    		set0 type = "(*)"
+    		set1 type = "(1..*)"
+    
+``` 
 
 
 
