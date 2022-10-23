@@ -115,10 +115,13 @@ public class XMIAttribute {
         
         else if(mult.equals("(*)"))
             this.mulType = MulTypes.seq;
+
+        else if(mult.equals("1...*") || mult.equals("1..*") || mult.equals("1.*"))
+            this.mulType = MulTypes.set1; 
         
         else if(mult.equals("*"))
             this.mulType = MulTypes.set;    
-
+            
         else this.mulType = MulTypes.empty;
     }
 
