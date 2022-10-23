@@ -10,14 +10,6 @@
 
 	<developers>
 		<developer>
-			<id>NickBattle</id>
-			<name>Nick Battle</name>
-			<email>nick.battle@gmail.com</email>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-		<developer>
 			<id>JonasLund</id>
 			<name>Jonas Lund</name>
 			<email>201906201@post.au.dk</email>
