@@ -21,27 +21,50 @@ If the type of the elements in a set is any other type, including a compound typ
 
 ### Non-Associative Map Types
 
+### Visibility
+Visibility is known as `access` in the object oriented dialects of VDM. 
+It is defined as:
+
+``` 
+visibility = ‘+’
+	       | ‘-’
+	       | ‘#’    
+``` 
+For public, private and protected, respectively. The default visibility to any component is private.
 
 ### Attribute Definition:
 
 ```
-Syntax:    
-     
-    attribute definition = [access] identifier ‘:’ type [stereotype]
+Syntax: attribute definition = [visibility] identifier ‘:’ type [attribute stereotype]
 
-    
+	access = ‘+’
+	       | ‘-’
+	       | ‘#’    
 ``` 
+For public, private and protected, respectively. The default access to an attribute is private.
+
+```
+	attribute stereotype = ‘<<type>>’
+			     | ‘<<value>>’	
+```
+The attribute stereotype is used to differentiate between types, values and instance variables. If no stereotype is used, the attribute is considered an instance variable.  
 
 ### Operation Definition:
+```
+Syntax: operation definition = [visibility] identifier ‘(’ [type] ‘)’ ‘:’ type' [operation stereotype]
 
+``` 
+Where `type` is the discretionary type which the operations takes as argument, and `type'` is the discretionary return type of the operation.   
+```
+	operation stereotype = ‘<<function>>’
+```
+The operation stereotype is used to differentiate between functions and operations. If no stereotype is used, the algorithm is considered an operation.
 
 
 ### Association Definition:
 	
 ```
-Syntax:    
-     
-    association definition = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable 
+Syntax:	association definition = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable 
 ``` 
 
 Where `class` is the identifier of the associating object, `class'` is the identifier of the associated object and `variable` is the identifier of the instance variable that is defined by the association.
@@ -49,27 +72,27 @@ Where `class` is the identifier of the associating object, `class'` is the ident
 
 ``` 
 
-    qualificaition = general map type
-                   | injective map type
-    
-    	general map type = ‘"[’ type ‘]"’ 
-    	injective map type = ‘"[(’ type ‘)]"’ 
-    
-    
-    multiplicity = set type
-                 | seq type
-    
-    	set type = set0 type
-             	 | set1 type
-             
-    		set0 type = "*"
-    		set1 type = "1..*"
-    
-    	seq type = seq0 type
-             	 | seq1 type
-    
-    		set0 type = "(*)"
-    		set1 type = "(1..*)"
+	qualificaition = general map type
+		       | injective map type
+
+	general map type = ‘"[’ type ‘]"’ 
+	injective map type = ‘"[(’ type ‘)]"’ 
+
+
+	multiplicity = set type
+		     | seq type
+
+	set type = set0 type
+		 | set1 type
+
+		set0 type = "*"
+		set1 type = "1..*"
+
+	seq type = seq0 type
+		 | seq1 type
+
+		set0 type = "(*)"
+		set1 type = "(1..*)"
     
 ``` 
 
