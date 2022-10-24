@@ -1,10 +1,11 @@
 
-
+# VDM-PlantUML Plugin
 
 
 
 ## Bi-directional mapping:
 
+The bi-directional mapping assumes that the type of the VDM component is a basic type or a combination of compound type with a maximum depth of 5 (todo: ?), otherwise will information will be abstracted, and the translation is no longer bi-directional, see (todo: internal link) for more information. 
 
 ### Basic Data Types
 
@@ -12,26 +13,35 @@ There is a one-to-one mapping of basic VDM data types between VDM and PlantUML,
 with the VDM symbol for the construct being represented as the type in a UML attribute or operation.
 
 
-### Set and Sequence types
+### Non-Associative Set and Sequence Types
 
 If the type of the elements in a set is a Class, the set is considered to be associative. 
 If the type of the elements in a set is any other type, including a compound type that refer to a class, the set is considered to be non-associative.
 
 
-
-#### Non-Associative sets and sequences:
-
+### Non-Associative Map Types
 
 
+### Attribute Definition:
 
-#### Associative sets and sequences:
+```
+Syntax:    
+     
+    attribute definition = [access] identifier ‘:’ type [stereotype]
+
+    
+``` 
+
+### Operation Definition:
+
+
+
+### Association Definition:
 	
 ```
 Syntax:    
      
-    type = association type
-
-    association type = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable    
+    association definition = class [qualificaition] ‘-->’ [multiplicity] class' ‘:’ ‘-’ variable 
 ``` 
 
 Where `class` is the identifier of the associating object, `class'` is the identifier of the associated object and `variable` is the identifier of the instance variable that is defined by the association.
@@ -65,7 +75,9 @@ Where `class` is the identifier of the associating object, `class'` is the ident
 
 
 
-### Non bi-directional mapping: VDM2UML
+## Non bi-directional mapping: VDM2UML
+
+Information is lost when translating betweeen VDM and PlantUML
 
 #### VDM Structure Abstraction
 
