@@ -51,6 +51,8 @@ public class XMIAttribute {
 
     private void initializeAssoc(Element rElement)
     {
+        this.visibility = "";
+        
         NodeList relAttList = rElement.getElementsByTagName("UML:AssociationEnd");
         
         Element relStart  = (Element) relAttList.item(0);
@@ -156,10 +158,10 @@ public class XMIAttribute {
 		if (element.getAttribute("visibility").contains("private")) 
 			return "private ";
 	
-		if (element.getAttribute("visibility").contains("public"))
+		else if (element.getAttribute("visibility").contains("public"))
             return "public ";
         
-        if (element.getAttribute("visibility").contains("protected"))
+        else if (element.getAttribute("visibility").contains("protected"))
             return "protected "; 
 
         else return "private ";
@@ -266,7 +268,7 @@ public class XMIAttribute {
                     asoc = getMulType() + this.relName;
             }
 
-            return stat + abs + this.name + map + asoc + ";\n";
+            return stat + abs + this.visibility + this.name + map + asoc + ";\n";
         }
         
         else return "undef";
