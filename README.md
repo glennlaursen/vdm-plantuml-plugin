@@ -19,20 +19,24 @@ with the VDM symbol for the type being represented as the type in a UML element.
 ### Set, Sequence and Map Types
 Non-associative, set, seq and map types are directily translated between PlantUML and VDM, with the VDM set, seq or map type being the type of the corrosponding UML attribute. 
 
-Set, Sequence and Map Types are the only types that can be associative. 
-
-
-If the type of the elements in a set, sequence or map is a Class, the compound type is considered to be associative and shown in the UML model as an [association](https://github.com/jolnd/vdm-plantuml-plugin#association-definition). 
-If the type of the elements is any other type, including another compound type that refer to a class, the set is considered to be non-associative and shown in the UML model as an [attribute](https://github.com/jolnd/vdm-plantuml-plugin#attribute-definition).
+If the type of the elements in a set, sequence or map is a class, the type is associative and shown in the UML model as an [association](https://github.com/jolnd/vdm-plantuml-plugin#association-definition). If the type of the elements is any other type, including another compound type that refers to a class, the type is non-associative and shown in the UML model as an [attribute](https://github.com/jolnd/vdm-plantuml-plugin#attribute-definition).
 
 
 ### Class Declarations:
 There is a one-to-one relationship between classes in UML and classes in VDM++/VDM-RT 
 Attributes and operations in PlantUML are defined within class declarations. 
 
+```
+Syntax: class = ‘class’ identifier [class body] 
+
+		class body = ‘{’ [definition block] ‘}’
+			
+			definition block = attribute definitions
+					 | operation definitions		   
+```
 
 ### Attribute Definition:
-
+An attribute occurs as a result of translating a VDM instance variable, type or value to UML.
 
 ```
 Syntax: attribute definition = [visibility] identifier ‘:’ type [attribute stereotype]
@@ -47,7 +51,7 @@ The attribute stereotype is used to differentiate between types, values and inst
 Syntax: operation definition = [visibility] identifier ‘(’ [type] ‘)’ ‘:’ type' [operation stereotype]
 
 ``` 
-Where `type` is the discretionary type which the operations take as argument, and `type'` is the discretionary return type of the operation.   
+Where `type` is the discretionary type which the operation takes as argument, and `type'` is the discretionary return type of the operation.   
 ```
 	operation stereotype = ‘<<function>>’
 ```
