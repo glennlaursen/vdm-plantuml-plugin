@@ -4,8 +4,14 @@ import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 
 public class UMLType
 {
+    enum Type
+	{
+		NONE, SET, SET1, SEQ, SEQ1, MAP, INMAP, PRODUCT, UNION, OPTIONAL, RECORD
+	}
+
     public Boolean isAsoc = false;
     public Boolean isMap = false;
+    public Type abstractedType = Type.NONE;
     public Boolean isType = false;
     public String qualifier = "";
     public String multiplicity = "";
@@ -14,6 +20,8 @@ public class UMLType
     public String paramsType = "";
     public String returnType = "";
     public int maxDepth = 3;
+    public int typeCost = 0;
+    public int capacity = -1;
     public int depth = 0;
     public PublicClassEnvironment env;
 
