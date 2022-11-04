@@ -23,8 +23,8 @@ import plugins.VDM2UML.UMLType.Type;
 
 public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLType>
 {
-	static int MAX_LOW_CAPACITY = 2;
-	static int MAX_HIGH_CAPACITY = 3;
+	static int MAX_LOW_CAPACITY = 3;
+	static int MAX_HIGH_CAPACITY = 4;
 	static int MAX_NUM_OF_COMPOSITE_TYPES = 5;
 
 	// Check if a type is one of the basic types of VDM
