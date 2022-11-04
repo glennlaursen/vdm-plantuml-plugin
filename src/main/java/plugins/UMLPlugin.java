@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -95,7 +96,7 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			URI uri = URI.create(params.get("uri"));
 
 			if (uri != null) {
-				isProject = Files.isDirectory(Path.of(uri));
+				isProject = Files.isDirectory(Paths.get(uri));
 			}
 			
 			TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
@@ -110,7 +111,7 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			String fileName = "";
 
 			if (isProject) {
-				String projectName = Path.of(uri).getFileName().toString();
+				String projectName = Paths.get(uri).getFileName().toString();
 				fileName = projectName;
 				for (TCClassDefinition cdef: classes)
 				{
@@ -119,7 +120,7 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 			else
 			{
-				String className = Path.of(uri).getFileName().toString();
+				String className = Paths.get(uri).getFileName().toString();
 				className = className.substring(0, className.lastIndexOf('.'));
 				fileName = className;
 				for (TCClassDefinition cdef: classes)
