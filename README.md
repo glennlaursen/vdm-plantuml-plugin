@@ -1,3 +1,4 @@
+todo: and "," to syntax strings
 
 # Support for PlantUML Visualizations of VDM Models 
 The VDM-PlantUML plugin is integrated into the VDM-VSCode extension, which provides VDM language support for Visual Studio Code (VS Code). 
@@ -120,41 +121,70 @@ This section describes cases where information is lost when translating from VDM
 This feature is not yet implemented.
 
 The VDM2UML type abstraction effects how compound types are represented in UML and can prevent class diagrams from becoming cluttered and verbose.
-The tradeoff is that the translation is no longer bi-directional, since information about types may be lost. This is an optional feature, enabled by default. To see how to turn the abstractions off, see the [translate to UML section of the VDM VSCode wiki](https://github.com/overturetool/vdm-vscode/wiki/Translation#translate-to-uml) 
+The tradeoff is that the translation is no longer bi-directional, since information about types may be lost. This is an optional feature, enabled by default. To see how to turn abstraction off, see the [translate to UML section of the VDM VSCode wiki](https://github.com/overturetool/vdm-vscode/wiki/Translation#translate-to-uml) 
 
-The VDM structure abstraction considers VDM compound types in two groups. The groups are the primary compound types, $C_{0}$, secondary compound types, $C_{1}$ and special compound types $C_{2}$. todo: composite types
+The VDM type abstraction splits VDM compound types into two groups. The groups are the primary compound types, $C_{0}$ and the secondary compound types, $C_{1}$. 
 
 $C_{0} = set, seq, map, optional$
 
 $C_{1} = product, union$. 
 
-$C_{2} = composite$. 
+Each group has a different capacity determined by $\gamma_{0}$, $\gamma_{1} \in Z*$, for $C_{0}$, $C_{1}$ respectively.
 
-The groups are used to determine the capacity of a given type. 
-
-For $C_{0}$, $C_{1}$ a corrosponding $\gamma_{0}$, $\gamma_{1} \in Z*$ exist.
-
-$\gamma_{0}$, $\gamma_{1}$ sets the capacity of the corrosponding group, which in turn decides how many compound types a type can compose, before it is deemed too complicated and therefore in need of abstraction. 
-
-This means that a compound type with multiple compound types within it, will belong to the group of the outer compound type. All non-basic types in the inner type count towards the capacity. If the capacity is reached, abstraction will be done in accordance to which group the type belongs to.    
+The capacity determines how many compound types any given type can compose, before it is deemed too complicated for UML and therefore in need of abstraction. 
 Note: The capacity for a map type is $2\gamma_{0}$, since a map type has twice the amount of subtypes compared to set or seq types.
 
+A compound type with multiple compound types within it, will belong to the group of the outer compound type. All non-basic types in the inner type count towards the capacity. If the capacity is reached, abstraction will be done in accordance to which group the type belongs to.    
+
+todo: product ununion capcacity used is counted as number of product or ununion symbols.
 
 ```
-C_0 abstraction = ‘seq of’ type_a
-                | ‘set of’ type_a
-                | ‘[’ type_a ‘]’ 
-                | ‘map’ type_a | basic type ‘to’ type_a | basic type
+abstraction = C_0 abstraction 
+	    | C_1 abstraction
 
-	type_a = C_0'
-	       | C_1'
-	       
-		C_0' = set...
-	       	     | seq...
-		     | []
-	       
+	C_0 abstraction = ‘seq of’ type_a
+			| ‘set of’ type_a
+			| ‘[’ type_a ‘]’ 
+			| ‘map’ type_a | basic type ‘to’ type_a | basic type
 
+		type_a = c_0'
+		       | c_1'
+
+			c_0' = set...
+			     | seq...
+			     | [...]
+
+			c_1' = ‘*’ {‘*’}
+			     | ‘|’ {‘|’}
+
+	C_1 abstraction = c_1'
 ```
+
+For $c_1'$, the number of symbols used is given by $n-1$ where n is the number of subtypes in the non-abstracted compound type. 
+
+todo: more than five c_1' *...
+
+#### Examples: 
+Let $\gamma_{0} = 1$, $\gamma_{1} = 3$
+
+| Original Type    | Abstraction |
+| ----------- | ----------- |
+| nat \| nat \| nat \| nat| Not abstracted|
+| bool * seq of map nat to nat | Not abstracted|
+| map set of char to token * bool| Not abstracted|
+| set of seq of char| Not abstracted|
+| nat \| seq of set of char \| nat | \|\| |
+| set of seq of char * bool | set of seq...|
+| set of bool * nat * token   | set of **|
+| [(char * nat) \| (seq of nat)] | [ \| ] |
+| map seq of (char * nat) to set of nat| map seq... to set...|
+| map (set of nat \| char) to bool} | map set... to bool|
+| map (set of nat \| char) to (bool * bool)|  map set... to * |
+| map set of (nat \| char) to [nat]| map set... to [...] |
+
+
+
+
 
 ## Non bi-directional mapping: UML2VDM
 This section describes cases where information is lost when translating from PlantUML to VDM.
