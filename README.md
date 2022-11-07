@@ -9,11 +9,10 @@ For information about using the plugin on VS Code see the [VDM-VSCode wiki](http
 ## Bi-directional Mapping:
 The following section describes the common form between PlantUML class diagrams and VDM models. This common form is defined by defining UML constructs using VDM components.  
 
-Before defining UML constructs like attributes, operations and associations, the way in which VDM types are treated in PlantUML will be described.  
+Before defining UML constructs like attributes, operations and associations, the way VDM types are treated in PlantUML will be described.  
 
 ### Basic Data Types
-There is a one-to-one mapping of basic VDM data types between VDM and PlantUML, 
-with the VDM symbol for the type being represented as the type in a UML element.
+There is a one-to-one mapping of basic VDM data types between VDM and PlantUML, with the VDM symbol for the type being represented as the type in a UML element.
 
 
 ### Set, Sequence and Map Types
@@ -35,7 +34,7 @@ For public, private and protected, respectively. The default visibility to any c
 
 
 ### Class Declarations:
-There is a one-to-one relationship between classes in UML and classes in VDM++/VDM-RT 
+There is a one-to-one relationship between classes in UML and classes in VDM++/VDM-RT. 
 Attributes and operations in PlantUML are defined within class declarations. 
 
 ```
@@ -87,7 +86,7 @@ Where `class` is the identifier of the associating object, `class'` is the ident
 ``` 
 
 	qualification = general map type
-		       | injective map type
+		      | injective map type
 
 	general map type = ‘"[’ type ‘]"’ 
 	injective map type = ‘"[(’ type ‘)]"’ 
@@ -98,15 +97,16 @@ Where `class` is the identifier of the associating object, `class'` is the ident
 
 	set type = set0 type
 		 | set1 type
+		 
 
-		set0 type = "*"
-		set1 type = "1..*"
+		set0 type = ‘"*"’
+		set1 type = ‘"1..*"’
 
 	seq type = seq0 type
 		 | seq1 type
 
-		set0 type = "(*)"
-		set1 type = "(1..*)"
+		set0 type = ‘"(*)"’
+		set1 type = ‘"(1..*)"’
     
 ``` 
 
@@ -115,23 +115,46 @@ Where `class` is the identifier of the associating object, `class'` is the ident
 ## Non bi-directional mapping: VDM2UML
 This section describes cases where information is lost when translating from VDM to PlantUML.
 
-### VDM2UML Structure Abstraction
-To avoid excessive information in the class diagrams certain VDM structures can be abstracted away.
 
-This effects how compound types are represented in UML and can prevent class diagrams from becoming cluttered and verbose.
-The tradeoff is that the translation is no longer bi-directional, since information about types may be lost.
+### VDM2UML Type Abstraction - Not yet implemented
+This feature is not yet implemented.
+
+The VDM2UML type abstraction effects how compound types are represented in UML and can prevent class diagrams from becoming cluttered and verbose.
+The tradeoff is that the translation is no longer bi-directional, since information about types may be lost. This is an optional feature, enabled by default. To see how to turn the abstractions off, see the [translate to UML section of the VDM VSCode wiki](https://github.com/overturetool/vdm-vscode/wiki/Translation#translate-to-uml) 
+
+The VDM structure abstraction considers VDM compound types in two groups. The groups are the primary compound types, $C_{0}$, secondary compound types, $C_{1}$ and special compound types $C_{2}$. todo: composite types
+
+$C_{0} = set, seq, map, optional$
+
+$C_{1} = product, union$. 
+
+$C_{2} = composite$. 
+
+The groups are used to determine the capacity of a given type. 
+
+For $C_{0}$, $C_{1}$ a corrosponding $\gamma_{0}$, $\gamma_{1} \in Z*$ exist.
+
+$\gamma_{0}$, $\gamma_{1}$ sets the capacity of the corrosponding group, which in turn decides how many compound types a type can compose, before it is deemed too complicated and therefore in need of abstraction. 
+
+This means that a compound type with multiple compound types within it, will belong to the group of the outer compound type. All non-basic types in the inner type count towards the capacity. If the capacity is reached, abstraction will be done in accordance to which group the type belongs to.    
+Note: The capacity for a map type is $2\gamma_{0}$, since a map type has twice the amount of subtypes compared to set or seq types.
 
 
-The VDM structure abstraction splits the VDM compound types into two groups. The two groupls are low capacity compound types, $C_{L}$ and high capacity compound types, $C_{h}$. 
+```
+C_0 abstraction = ‘seq of’ type_a
+                | ‘set of’ type_a
+                | ‘[’ type_a ‘]’ 
+                | ‘map’ type_a | basic type ‘to’ type_a | basic type
 
+	type_a = C_0'
+	       | C_1'
+	       
+		C_0' = set...
+	       	     | seq...
+		     | []
+	       
 
-
-
-capacity is a whole number.
-
-
-
-
+```
 
 ## Non bi-directional mapping: UML2VDM
 This section describes cases where information is lost when translating from PlantUML to VDM.
