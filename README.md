@@ -132,11 +132,9 @@ $C_{1} = product, union$.
 Each group has a different capacity determined by $\gamma_{0}$, $\gamma_{1} \in Z*$, for $C_{0}$, $C_{1}$ respectively.
 
 The capacity determines how many compound types any given type can compose, before it is deemed too complicated for UML and therefore in need of abstraction. 
-Note: The capacity for a map type is $2\gamma_{0}$, since a map type has twice the amount of subtypes compared to set or seq types.
 
 A compound type with multiple compound types within it, will belong to the group of the outer compound type. All non-basic types in the inner type count towards the capacity. If the capacity is reached, abstraction will be done in accordance to which group the type belongs to.    
 
-todo: product ununion capcacity used is counted as number of product or ununion symbols.
 
 ```
 abstraction = C_0 abstraction 
@@ -159,6 +157,7 @@ abstraction = C_0 abstraction
 
 	C_1 abstraction = c_1'
 ```
+The capacity for a map type is $2\gamma_{0}$, since a map has a minnimum of two subtypes. This is also why a map type can have a basic type as one of its subtypes and still be abstracted, if the other subtype consist of enough compound sub-types to excede the capacity. 
 
 For $c_1'$, the number of symbols used is given by $n-1$ where n is the number of subtypes in the non-abstracted compound type. 
 
@@ -167,20 +166,19 @@ todo: more than five c_1' *...
 #### Examples: 
 Let $\gamma_{0} = 1$, $\gamma_{1} = 3$
 
-| Original Type    | Abstraction |
-| ----------- | ----------- |
-| nat \| nat \| nat \| nat| Not abstracted|
-| bool * seq of map nat to nat | Not abstracted|
-| map set of char to token * bool| Not abstracted|
-| set of seq of char| Not abstracted|
-| nat \| seq of set of char \| nat | \|\| |
-| set of seq of char * bool | set of seq...|
-| set of bool * nat * token   | set of **|
-| [(char * nat) \| (seq of nat)] | [ \| ] |
-| map seq of (char * nat) to set of nat| map seq... to set...|
-| map (set of nat \| char) to bool} | map set... to bool|
-| map (set of nat \| char) to (bool * bool)|  map set... to * |
-| map set of (nat \| char) to [nat]| map set... to [...] |
+| Original Type | Capacity Used | Abstraction |
+| ----------- | ----------- | ----------- |
+| nat \| nat \| nat \| nat| 3 |  Not abstracted|
+| bool * seq of map nat to nat | 3 | Not abstracted|
+| map set of char to token * bool| 2 | Not abstracted|
+| set of seq of char| 1 | Not abstracted|
+| nat \| seq of set of char \| nat | 4 | \|\| |
+| set of seq of char * bool | 2 | set of seq...|
+| set of bool * nat * token | 2 | set of **|
+| [(char * nat) \| (seq of nat)] | 4 | [ \| ] |
+| map seq of (char * nat) to set of nat | 3 | map seq... to set...|
+| map (set of nat \| char) to (bool * bool)| 3 | map set... to * |
+| map set of (nat \| char) to [nat]| | map set... to [...] |
 
 
 
