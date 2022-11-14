@@ -6,7 +6,7 @@ The object-oriented (OO) structure of the VDM models are represented in UML as [
 For information about using the plugin on VS Code see the [VDM-VSCode wiki](https://github.com/overturetool/vdm-vscode/wiki/Translation#Translate-to-UML).
 
 ## Bi-directional Mapping:
-The following section describes the common form between PlantUML class diagrams and VDM models. This common form is defined by defining UML constructs using VDM components.  
+The following section describes the common form between PlantUML class diagrams and VDM models. This common form is described by defining UML constructs using VDM components.  
 
 Before defining UML constructs like attributes, operations and associations, the way VDM types are treated in PlantUML will be described.  
 
@@ -45,7 +45,7 @@ Syntax: class = ‘class’ identifier [class body]
 					 | operation definitions		   
 ```
 
-### Attribute Definition:
+### Attribute Definitions:
 UML attributes occur when translating a VDM instance variable, type, or value to UML.
 
 ```
@@ -56,7 +56,7 @@ Syntax: attribute definition = [visibility] identifier ‘:’ type [attribute s
 ```
 The attribute stereotype is used to differentiate between types, values, and instance variables. If no stereotype is used, the attribute is considered an instance variable.  
 
-### Operation Definition:
+### Operation Definitions:
 UML operations occur when translating VDM operations or functions to UML.
 
 ```
@@ -70,7 +70,7 @@ Where `type` is the discretionary type which the operation takes as argument, an
 The operation stereotype is used to differentiate between VDM functions and operations. If no stereotype is used, the algorithm is considered an operation.
 
 
-### Association Definition:
+### Association Definitions:
 UML associations occur when the type of a VDM instance variable is a class or when the instance variable is a set, sequence or map type with a class as its subtype. When deciding if a map type from a type A to a type B is an association, type B is considered. Associations in PlantUML are defined after [class declarations](https://github.com/jolnd/vdm-plantuml-plugin#class-declarations)
 
 The use of set and sequence types dictate the multiplicity of the association and the use of the map type produce a qualified association.
@@ -174,7 +174,7 @@ Let $\gamma_{0} = 1$, $\gamma_{1} = 3$
 | [(char * nat) \| (seq of nat)] | 4 | [ \| ] |
 | map seq of (char * nat) to set of nat | 3 | map seq... to set...|
 | map (set of nat \| char) to (bool * bool)| 3 | map set... to * |
-| map set of (nat \| char) to [nat]| | map set... to [...] |
+| map set of (nat \| char) to [nat]| 3 | map set... to [...] |
 
 
 
