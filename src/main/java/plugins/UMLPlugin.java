@@ -109,9 +109,11 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 			PlantBuilder pBuilder = new PlantBuilder(classes);
 			String fileName = "";
+			String name;
 
 			if (isProject) {
 				String projectName = Paths.get(uri).getFileName().toString();
+				name = projectName;
 				fileName = projectName;
 				for (TCClassDefinition cdef: classes)
 				{
@@ -123,18 +125,20 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 				String className = Paths.get(uri).getFileName().toString();
 				className = className.substring(0, className.lastIndexOf('.'));
 				fileName = className;
+				name = fileName;
 				for (TCClassDefinition cdef: classes)
 				{
 					String cdefName = cdef.toString();
 					cdefName = cdefName.substring(cdefName.indexOf(" ")+1, cdefName.indexOf("\n"));
 					if (cdefName.equalsIgnoreCase(className))
 					{
+						name = cdefName;
 						cdef.apply(new UMLGenerator(), pBuilder);
 					}
 				}
 			}
 
-			StringBuilder boiler = UMLGenerator.buildBoiler();
+			StringBuilder boiler = UMLGenerator.buildBoiler(name);
 			
 			File outfile = new File(saveUri, fileName + ".puml");
 			PrintWriter out = new PrintWriter(outfile);

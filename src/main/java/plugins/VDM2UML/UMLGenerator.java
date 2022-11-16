@@ -251,11 +251,13 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		return res;
 	}
 
-	static public StringBuilder buildBoiler() 
+	static public StringBuilder buildBoiler(String name) 
 	{
 		StringBuilder boiler = new StringBuilder();
 
-		boiler.append("@startuml\n\n");
+		boiler.append("@startuml ");
+		boiler.append(name);
+		boiler.append("\n\n");
 		boiler.append("hide empty members\n");
 		boiler.append("skinparam Shadowing false\n");
 		boiler.append("skinparam classAttributeIconSize 0\n");

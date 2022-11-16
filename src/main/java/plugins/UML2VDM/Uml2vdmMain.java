@@ -59,6 +59,7 @@ public class Uml2vdmMain {
 			xmiDiagram.transformerXml(os);
 			
 			InputSource is = new InputSource();
+			is.setEncoding("UTF-8");
 			is.setCharacterStream(new StringReader(os.toString()));
 
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

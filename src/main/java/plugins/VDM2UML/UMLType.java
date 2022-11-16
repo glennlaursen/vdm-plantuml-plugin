@@ -1,5 +1,8 @@
 package plugins.VDM2UML;
 
+import java.util.ArrayList;
+import java.awt.Point;
+
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 
 public class UMLType
@@ -11,7 +14,7 @@ public class UMLType
 
     public Boolean isAsoc = false;
     public Boolean isMap = false;
-    public Type abstractedType = Type.NONE;
+    public Type prevType = Type.NONE;
     public Boolean isType = false;
     public String qualifier = "";
     public String multiplicity = "";
@@ -19,33 +22,42 @@ public class UMLType
     public String inClassType = "";
     public String paramsType = "";
     public String returnType = "";
-    public int maxDepth = 3;
+    public int maxDepth = 10;
     public int typeCost = 0;
-    public int capacity = -1;
+    public ArrayList<Point> capacities;
     public int depth = 0;
     public PublicClassEnvironment env;
 
     public UMLType(PublicClassEnvironment _env) 
     {
+        capacities = new ArrayList<Point>(0);
         env = _env;
     }
 
     public UMLType(PublicClassEnvironment _env, int _maxDepth) 
     {
+        capacities = new ArrayList<Point>(0);
         env = _env;
         maxDepth = _maxDepth;
     }
 
     public UMLType(PublicClassEnvironment _env, Boolean _isType) 
     {
+        capacities = new ArrayList<Point>(0);
         env = _env;
         isType = _isType;
     }
 
     public UMLType(PublicClassEnvironment _env, int _maxDepth, Boolean _isType) 
     {
+        capacities = new ArrayList<Point>(0);
         env = _env;
         maxDepth = _maxDepth;
         isType = _isType;
+    }
+
+    public void addCapacity(int cap)
+    {
+        capacities.add(new Point(cap, 0));
     }
 }
