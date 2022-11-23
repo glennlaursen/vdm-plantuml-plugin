@@ -21,8 +21,8 @@ For information about using the plugin on VS Code see the [VDM-VSCode wiki](http
 | Associative set1 | collection1 : set1 of Object2 | Object1 --> "1..*" Object2 : collection1 | 
 | Associative seq | collection1 : seq of Object2 | Object1 --> "(*)" Object2 : collection1 |
 | Associative seq1 | collection1 : seq1 of Object2 | Object1 --> "(1..*)" Object2 : collection1 |
-| Associative map | quali1 : map Type to Object2; | Object1 "[Type]" -> Object2 : quali1 |
-| Associative inmap | quali1 : inmap Type to Object2; | Object1 "[(Type)]" -> Object2 : quali1 |
+| Associative map | quali1 : map Type to Object2; | Object1 "[Type]" --> Object2 : quali1 |
+| Associative inmap | quali1 : inmap Type to Object2; | Object1 "[(Type)]" --> Object2 : quali1 |
 | Static Keyword (not implemented) | static member1 ... | {static} : member1 |
 | Visibility | private member1 <br /> protected member2 <br /> public member3 | - member1 <br /> # member2 <br /> + member3 |
 | In Keyword| operations <br /> op1 : type1 * type2 ==> Type; <br /> op1(in t1: type1, in t2: type2) == ( ... ); | op1(in t1: type1, in t2: type2) : Type |
