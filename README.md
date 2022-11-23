@@ -16,9 +16,9 @@ For information about using the plugin on VS Code see the [VDM-VSCode wiki](http
 | Operation Definitions| operations <br /> op1 : Type ==> Type; <br /> op1() == ( ... ); | op1() : Type |
 | Function Definitions| functions <br /> func1 : Type ==> Type; <br /> func1() == ( ... ); | func1() : Type «function» |
 | Associations | class A <br /> ... <br /> instance variables <br /> asoc1 : B;| A --> B : asoc1 |
-| Associative set | asoc1 : set of B | A --> "*" B : asoc1 |
+| Associative set | asoc1 : set of B | A --> "0..*" B : asoc1 |
 | Associative set1 | asoc1 : set1 of B | A --> "1..*" B : asoc1 | 
-| Associative seq | asoc1 : seq of B | A --> "(*)" B : asoc1 |
+| Associative seq | asoc1 : seq of B | A --> "(0..*)" B : asoc1 |
 | Associative seq1 | asoc1 : seq1 of B | A --> "(1..*)" B : asoc1 |
 | Associative map | asoc1 : map Type to B; | A "[Type]" --> B : asoc1 |
 | Associative inmap | asoc1 : inmap Type to B; | A "[(Type)]" --> B : asoc1 |
