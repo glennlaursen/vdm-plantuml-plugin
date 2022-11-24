@@ -54,13 +54,15 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	{	
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
-		type.apply(new UMLTypeVisitor(), umlType);
+		type.apply(new UMLAssociationCheckVisitor(), umlType);
+
+		System.out.println("isAsoc: " + umlType.isAsoc + ", for type: " + type.toString());
 
 		String visibility = visibility(node.accessSpecifier);
 		String varName = node.name.getName();
 		String className = node.classDefinition.name.getName();
 
-		if (umlType.isAsoc) 
+		if (umlType.isAsoc)
 		{
 			/* 
 			 * Create instance variable as association 
@@ -94,6 +96,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			/*
 			 * Create instance variable as attribute in class 
 			 */
+
+			type = node.getType();
+			UMLType umlInstanceType = new UMLType(PlantBuilder.env, false);
+			type.apply(new UMLTypeVisitor(), umlInstanceType);
 
 			arg.defs.append("\t");
 			if (!visibility.isEmpty())

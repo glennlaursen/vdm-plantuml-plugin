@@ -16,10 +16,12 @@ public class UMLType
     public Boolean isMap = false;
     public Type prevType = Type.NONE;
     public Boolean isType = false;
+    public Boolean useTempType = false;
     public String qualifier = "";
     public String multiplicity = "";
     public String endClass = "";
     public String inClassType = "";
+    public String tempType = "";
     public String paramsType = "";
     public String returnType = "";
     public int maxDepth = 10;
