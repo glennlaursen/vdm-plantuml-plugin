@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<version>4.5.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<groupId>dk.au.ece.vdmj</groupId>
 	<artifactId>uml</artifactId>
 	<name>UML</name>
-	<description>Translations between VDM++ and PlantUML through VDMJ</description>
+	<description>Translations between VDM++/VDMRT and PlantUML through VDMJ</description>
 
 	<developers>
 		<developer>
@@ -68,6 +68,8 @@
 				  <descriptorRefs>
 					<descriptorRef>jar-with-dependencies</descriptorRef>
 				  </descriptorRefs>
+				  <finalName>${project.artifactId}-${project.version}</finalName>
+        		  <appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 				  <execution>
