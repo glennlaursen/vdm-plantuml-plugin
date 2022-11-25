@@ -293,7 +293,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	private String removeExcessSpaces(String before)
 	{
 		// For removing excess blank spaces
-		
+
 		String after = before.trim().replaceAll(" +", " ");
 		return after;
 	}

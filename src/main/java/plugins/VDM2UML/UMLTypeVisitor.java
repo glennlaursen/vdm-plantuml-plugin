@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.awt.Point;
 
 import com.fujitsu.vdmj.tc.types.TCBracketType;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -791,6 +792,9 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_HIGH_CAPACITY);
 
+		int capacityNum = arg.capacities.size();
+		int newCapacityNum;
+
 		if (isOverCapacity)
 		{
 			typeString += "... ";
@@ -805,18 +809,44 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			typeString += " of ";
 		}
+		
+		arg.prevType = Type.RECORD;
+
+		if (node.fields.size() > MAX_NUM_OF_COMPOSITE_TYPES)
+		{
+			typeString = ":: ";
+			setTypeString(typeString, arg);
+			return null;
+		}
 
 		if (!arg.isType || !arg.namedType.equals(node.name.toString()))
 		{
 			typeString += node.name.toString();
+			setTypeString(typeString, arg);
+			return null;
 		}
-		else
-		{
-			typeString += "::";
-		}
-
-		setTypeString(typeString, arg);
 		
+		setTypeString("{", arg);
+		int i = 0;
+		for (TCField field : node.fields)
+		{
+			setTypeString(field.tagname.getName(), arg);
+			if (checkCapacities(arg) || i == node.fields.size() - 1)
+			{
+				i = node.fields.size();
+			}
+			else
+			{
+				setTypeString(" : ", arg);
+			}
+			if (i > 0)
+			{
+				checkAndSetCapacities(arg);
+			}
+			i++;
+		}
+		setTypeString("}", arg);
+
 		return null;
 	}
 
@@ -901,11 +931,11 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			typeString += " of ";
 		}
-		typeString += "(";
+		typeString += "{";
 		setTypeString(typeString, arg);
 		node.type.apply(new UMLTypeVisitor(), arg);
-		setTypeString(")", arg);
-		
+		setTypeString("}", arg);
+
 		return null;
 	}
 
