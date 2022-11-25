@@ -129,7 +129,7 @@ public class XMIAttribute {
 
     private void setAttType(Element aElement)
     {
-        if (aElement.getAttribute("name").contains("«value»") || aElement.getAttribute("name").contains("value>>"))
+        if (aElement.getAttribute("name").contains("«value»"))
         {
             this.attType = AttTypes.value;
             this.name = aElement.getAttribute("name").replace(" «value»", "");             

@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -95,7 +96,7 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			URI uri = URI.create(params.get("uri"));
 
 			if (uri != null) {
-				isProject = Files.isDirectory(Path.of(uri));
+				isProject = Files.isDirectory(Paths.get(uri));
 			}
 			
 			TCPlugin tcPlugin = PluginRegistry.getInstance().getPlugin("TC");
@@ -108,9 +109,11 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 
 			PlantBuilder pBuilder = new PlantBuilder(classes);
 			String fileName = "";
+			String name;
 
 			if (isProject) {
-				String projectName = Path.of(uri).getFileName().toString();
+				String projectName = Paths.get(uri).getFileName().toString();
+				name = projectName;
 				fileName = projectName;
 				for (TCClassDefinition cdef: classes)
 				{
@@ -119,21 +122,23 @@ public class UMLPlugin extends AnalysisPlugin implements EventListener {
 			}
 			else
 			{
-				String className = Path.of(uri).getFileName().toString();
+				String className = Paths.get(uri).getFileName().toString();
 				className = className.substring(0, className.lastIndexOf('.'));
 				fileName = className;
+				name = fileName;
 				for (TCClassDefinition cdef: classes)
 				{
 					String cdefName = cdef.toString();
 					cdefName = cdefName.substring(cdefName.indexOf(" ")+1, cdefName.indexOf("\n"));
 					if (cdefName.equalsIgnoreCase(className))
 					{
+						name = cdefName;
 						cdef.apply(new UMLGenerator(), pBuilder);
 					}
 				}
 			}
 
-			StringBuilder boiler = UMLGenerator.buildBoiler();
+			StringBuilder boiler = UMLGenerator.buildBoiler(name);
 			
 			File outfile = new File(saveUri, fileName + ".puml");
 			PrintWriter out = new PrintWriter(outfile);
