@@ -25,6 +25,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseClassDefinition(TCClassDefinition node, PlantBuilder arg)
 	{
+		/**
+		 * Create class definition 
+		 */
+		
 		arg.defs.append("class ");
 		arg.defs.append(node.name.getName());
 		arg.defs.append("\n{\n");
@@ -37,6 +41,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		/**
 		 * Create association to superclass if class is subclass
 		 */
+
 		for (TCType inheritedClass : node.supertypes)
 		{
 			arg.asocs.append(inheritedClass.toString());
@@ -70,7 +75,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			if (!umlType.qualifier.isEmpty())
 			{
 				arg.asocs.append(" \"[");
-				arg.asocs.append(umlType.qualifier);
+				arg.asocs.append(removeExcessSpaces(umlType.qualifier));
 				arg.asocs.append("]\"");
 			}
 			arg.asocs.append(" --> ");
@@ -80,7 +85,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 				arg.asocs.append(umlType.multiplicity);
 				arg.asocs.append("\" ");
 			}
-			arg.asocs.append(umlType.endClass);
+			arg.asocs.append(removeExcessSpaces(umlType.endClass));
 			arg.asocs.append(" : ");
 			if (!visibility.isEmpty())
 			{
@@ -104,7 +109,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			{
 				arg.defs.append(visibility);
 			}
-			arg.defs.append(varName + " : " + umlInstanceType.inClassType);
+			arg.defs.append(varName + " : " + removeExcessSpaces(umlInstanceType.inClassType));
 			arg.defs.append("\n");
 		}
 		
@@ -114,8 +119,11 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseTypeDefinition(TCTypeDefinition node, PlantBuilder arg)
 	{
+		/**
+		 * Create type definition 
+		 */
+
 		TCType type = node.getType();
-		// System.out.println(node.name.getName());
 		UMLType umlType = new UMLType(PlantBuilder.env, true);
 		umlType.namedType = node.name.getName();
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -124,7 +132,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
 		arg.defs.append(" : ");
-		arg.defs.append(umlType.inClassType);
+		arg.defs.append(removeExcessSpaces(umlType.inClassType));
 		arg.defs.append(" <<type>>");
 		arg.defs.append("\n");
 
@@ -134,6 +142,9 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseValueDefinition(TCValueDefinition node, PlantBuilder arg)
 	{
+		/**
+		 * Create value definition 
+		 */
 		// TODO: Show what the value is?
 
 		for (TCDefinition def : node.getDefinitions()) 
@@ -146,7 +157,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			arg.defs.append(visibility(def.accessSpecifier));
 			arg.defs.append(def.name.getName());
 			arg.defs.append(" : ");
-			arg.defs.append(umlType.inClassType);
+			arg.defs.append(removeExcessSpaces(umlType.inClassType));
 			arg.defs.append(" <<value>>");
 			arg.defs.append("\n");
 		}
@@ -157,6 +168,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, PlantBuilder arg)
 	{
+		/**
+		 * Create explicit function definition 
+		 */
+
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -165,12 +180,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
-		arg.defs.append(umlType.paramsType);
+		arg.defs.append(removeExcessSpaces(umlType.paramsType));
 		arg.defs.append(")");
 		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
-			arg.defs.append(umlType.returnType);
+			arg.defs.append(removeExcessSpaces(umlType.returnType));
 		}
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
@@ -181,6 +196,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseExplicitOperationDefinition(TCExplicitOperationDefinition node, PlantBuilder arg)
 	{	
+		/**
+		 * Create explicit operation definition 
+		 */
+
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -189,12 +208,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
-		arg.defs.append(umlType.paramsType);
+		arg.defs.append(removeExcessSpaces(umlType.paramsType));
 		arg.defs.append(")");
 		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
-			arg.defs.append(umlType.returnType);
+			arg.defs.append(removeExcessSpaces(umlType.returnType));
 		}
 		arg.defs.append("\n");
 
@@ -202,6 +221,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	}
 
 	public Object caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, PlantBuilder arg) {
+		/**
+		 * Create implicit function definition 
+		 */
+
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -210,12 +233,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
-		arg.defs.append(umlType.paramsType);
+		arg.defs.append(removeExcessSpaces(umlType.paramsType));
 		arg.defs.append(")");
 		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
-			arg.defs.append(umlType.returnType);
+			arg.defs.append(removeExcessSpaces(umlType.returnType));
 		}
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
@@ -224,6 +247,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	}
 	  
 	public Object caseImplicitOperationDefinition(TCImplicitOperationDefinition node, PlantBuilder arg) {
+		/**
+		 * Create implicit operation definition 
+		 */
+
 		TCType type = node.getType();
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLTypeVisitor(), umlType);
@@ -232,12 +259,12 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		arg.defs.append(visibility(node.accessSpecifier));
 		arg.defs.append(node.name.getName());
 		arg.defs.append("(");
-		arg.defs.append(umlType.paramsType);
+		arg.defs.append(removeExcessSpaces(umlType.paramsType));
 		arg.defs.append(")");
 		if (!(umlType.returnType.equals("") || umlType.returnType.equals("()")))
 		{
 			arg.defs.append(" : ");
-			arg.defs.append(umlType.returnType);
+			arg.defs.append(removeExcessSpaces(umlType.returnType));
 		}
 		arg.defs.append(" <<function>>");
 		arg.defs.append("\n");
@@ -247,6 +274,10 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 
 	private String visibility(TCAccessSpecifier access)
 	{	
+		/**
+		 * Create get visibility token as string
+		 */
+
 		String res = "";
 
 		if (access.access == Token.PUBLIC)
@@ -259,8 +290,18 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		return res;
 	}
 
+	private String removeExcessSpaces(String before)
+	{
+		// For removing excess blank spaces
+		
+		String after = before.trim().replaceAll(" +", " ");
+		return after;
+	}
+
 	static public StringBuilder buildBoiler(String name) 
 	{
+		// For building boiler plate source code for the puml file
+
 		StringBuilder boiler = new StringBuilder();
 
 		boiler.append("@startuml ");

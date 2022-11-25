@@ -28,7 +28,6 @@ public class UMLType
     public String mapType = "";
     public String paramsType = "";
     public String returnType = "";
-    public String currentClass = "";
     public int typeCost = 0;
     public ArrayList<Point> capacities;
     public int depth = 0;
