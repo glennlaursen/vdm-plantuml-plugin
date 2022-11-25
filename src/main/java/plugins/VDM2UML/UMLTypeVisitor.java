@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Vector;
 import java.awt.Point;
 
+import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -24,8 +25,8 @@ import plugins.VDM2UML.UMLType.Type;
 
 public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLType>
 {
-	static int MAX_LOW_CAPACITY = 1;			// Capacityset, seq and optional types
-	static int MAX_HIGH_CAPACITY = 3;			// Capacitymap, union, product and record (?) types
+	static int MAX_LOW_CAPACITY = 1;			// Capacity map, set, seq and optional types
+	static int MAX_HIGH_CAPACITY = 3;			// Capacity union, product and record (?) types
 	static int MAX_NUM_OF_COMPOSITE_TYPES = 5;
 
 	// Check if a type is onethe basic typesVDM
@@ -73,49 +74,32 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		}
 	}
 
-	private String getAbstractType(Type type)
+	private void setTypeString(String typeString, UMLType arg)
 	{
-		String res = "";
-		switch(type)
+		if (arg.useTempType && arg.useMapType)
 		{
-			case INMAP:
-				res = "inmap...";
-				break;
-			case MAP:
-				res = "map...";
-				break;
-			case NONE:
-				res = "...";
-				break;
-			case OPTIONAL:
-				res = "[...]";
-				break;
-			case PRODUCT:
-				res = "*...";
-				break;
-			case UNION:
-				res = "|...";
-				break;
-			case RECORD:
-				res = "::...";
-				break;
-			case SEQ:
-				res = "seq...";
-				break;
-			case SEQ1:
-				res = "seq1...";
-				break;
-			case SET:
-				res = "set...";
-				break;
-			case SET1:
-				res = "set1...";
-				break;
-			default:
-				res = "";
-				break;
+			if (arg.tempBeforeMap)
+			{
+				arg.mapType += typeString;
+			}
+			else
+			{
+				arg.tempType += typeString;
+			}
+			return;
 		}
-		return res;
+		if (arg.useMapType)
+		{
+			arg.mapType += typeString;
+			return;
+		}
+		if (arg.useTempType)
+		{
+			arg.tempType += typeString;
+			return;
+		}
+		arg.inClassType += typeString;
+		return;
 	}
 
 	private Boolean checkAndSetCapacities(UMLType arg)
@@ -161,33 +145,23 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			isOverCapacity = checkCapacities(arg);
 		}
 
-		if (!arg.isMap)
+		if (isOverCapacity)
 		{
-			if (isOverCapacity)
-			{
-				typeString = "...";
-			}
-			else
-			{
-				if (arg.prevType == Type.SET1 ||
-					arg.prevType == Type.SET  || 
-					arg.prevType == Type.SEQ1 || 
-					arg.prevType == Type.SEQ
-				)
-				{
-					typeString += " of ";
-				}
-				typeString += node.toString();
-			}
+			typeString = "... ";
+			setTypeString(typeString, arg);
+			return null;
 		}
-		if (arg.useTempType)
+		if (arg.prevType == Type.SET1 ||
+			arg.prevType == Type.SET  || 
+			arg.prevType == Type.SEQ1 || 
+			arg.prevType == Type.SEQ
+		)
 		{
-			arg.tempType += typeString;
+			typeString += " of ";
 		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		typeString += node.toString();
+
+		setTypeString(typeString, arg);
 		
 		return null;
 	}
@@ -197,9 +171,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
 		String typeString = "";
 
-		if (arg.isType) 
+		if (arg.isType && arg.namedType.equals(node.toString())) 
 		{
 			node.type.apply(new UMLTypeVisitor(), arg);
+			return null;
 		}
 		else
 		{
@@ -207,28 +182,21 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 			if (isOverCapacity)
 			{
-				typeString += "...";
+				typeString += "... ";
+				setTypeString(typeString, arg);
+				return null;
 			}
-			else
+			if (arg.prevType == Type.SET1 || 
+				arg.prevType == Type.SET  || 
+				arg.prevType == Type.SEQ1 || 
+				arg.prevType == Type.SEQ
+			)
 			{
-				if (arg.prevType == Type.SET1 ||
-					arg.prevType == Type.SET  || 
-					arg.prevType == Type.SEQ1 || 
-					arg.prevType == Type.SEQ
-				)
-				{
-					typeString += " of ";
-				}
-				typeString += node.toString();
+				typeString += " of ";
 			}
-		}
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
+			
+			typeString += node.toString();
+			setTypeString(typeString, arg);
 		}
 
 		return null;
@@ -241,20 +209,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		String typeString = "";
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
-		arg.addCapacity(MAX_LOW_CAPACITY);		
+		arg.addCapacity(MAX_LOW_CAPACITY);
 
-		// arg.abstractedType = Type.SET1;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 || 
@@ -269,14 +229,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.prevType = Type.SET1;
 		typeString += "set1";
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		node.setof.apply(new UMLTypeVisitor(), arg);
 
@@ -292,18 +245,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_LOW_CAPACITY);
 
-		// arg.abstractedType = Type.SET;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 || 
@@ -318,14 +263,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.prevType = Type.SET;
 		typeString += "set";
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		node.setof.apply(new UMLTypeVisitor(), arg);
 
@@ -341,18 +279,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_LOW_CAPACITY);
 
-		// arg.abstractedType = Type.SEQ1;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 || 
@@ -367,14 +297,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.prevType = Type.SEQ1;
 		typeString += "seq1";
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		node.seqof.apply(new UMLTypeVisitor(), arg);
 
@@ -390,18 +313,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_LOW_CAPACITY);
 
-		// arg.abstractedType = Type.SEQ;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 || 
@@ -416,14 +331,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		arg.prevType = Type.SEQ;
 		typeString += "seq";
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		node.seqof.apply(new UMLTypeVisitor(), arg);
 
@@ -439,18 +347,10 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_LOW_CAPACITY);
 
-		// arg.abstractedType = Type.OPTIONAL;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -469,26 +369,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		}
 		typeString += "[";
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		node.type.apply(new UMLTypeVisitor(), arg);
 
 		typeString = "]";
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		return null;
 	}
@@ -500,19 +386,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		String typeString = "";
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
-		arg.addCapacity(MAX_LOW_CAPACITY * 2);
+		// arg.addCapacity(MAX_LOW_CAPACITY * 2);
 
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -523,40 +402,88 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			typeString += " of ";
 		}
-		
-		arg.prevType = Type.INMAP;
-		typeString += "inmap ";
+		setTypeString(typeString, arg);
 
-		if (arg.useTempType)
+		isOverCapacity = checkAndSetCapacities(arg);
+		if (isOverCapacity || arg.useMapType)
 		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
-
-		node.from.apply(new UMLTypeVisitor(), arg);
-		
-		isOverCapacity = checkCapacities(arg);
-		// TODO: Handle maps better
-		if (isOverCapacity)
-		{
+			typeString = "inmap...";
+			setTypeString(typeString, arg);
 			return null;
 		}
 
-		typeString += " to ";
-
+		UMLCost fromCost = new UMLCost();
+		UMLCost toCost = new UMLCost();
+		node.from.apply(new UMLMapVisitor(), fromCost);
+		node.to.apply(new UMLMapVisitor(), toCost);
+		
+		Boolean abstractFrom = false;
+		Boolean abstractTo = false;
+		if (fromCost.cost > MAX_LOW_CAPACITY)
+		{
+			if (toCost.cost != 0)
+			{
+				abstractFrom = true;
+			}
+		}
+		if (toCost.cost > MAX_LOW_CAPACITY)
+		{
+			if (fromCost.cost != 0)
+			{
+				abstractTo = true;
+			}
+		}
+		
+		arg.prevType = Type.INMAP;
+		arg.useMapType = true;
 		if (arg.useTempType)
 		{
-			arg.tempType += typeString;
+			arg.tempBeforeMap = true;
 		}
 		else
 		{
-			arg.inClassType += typeString;
+			arg.tempBeforeMap = false;
 		}
+		typeString = "inmap ";
+		setTypeString(typeString, arg);
 
-		node.to.apply(new UMLTypeVisitor(), arg);
+		if (abstractFrom)
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY);
+		}
+		else
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY * 2);
+		}
+		int capacityNum = arg.capacities.size();
+		node.from.apply(new UMLTypeVisitor(), arg);
+		
+		int newCapacityNum = arg.capacities.size();
+		for (int i = capacityNum; i < newCapacityNum; i++)
+		{
+			arg.capacities.remove(arg.capacities.size() - 1);
+		}
+		arg.capacities.remove(arg.capacities.size() - 1);
+
+		arg.prevType = Type.INMAP;
+		typeString = " to ";
+		setTypeString(typeString, arg);
+
+		if (abstractTo)
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY);
+		}
+		else
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY * 2);
+		}
+		capacityNum = arg.capacities.size();
+		node.to.apply(new UMLTypeVisitor(), arg); 
+
+		arg.useMapType = false;
+		arg.tempBeforeMap = true;
+		setTypeString(arg.mapType, arg);
+		arg.mapType = "";
 
 		return null;
 	}
@@ -568,19 +495,12 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		String typeString = "";
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
-		arg.addCapacity(MAX_LOW_CAPACITY * 2);
+		// arg.addCapacity(MAX_LOW_CAPACITY * 2);
 
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -591,35 +511,89 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		{
 			typeString += " of ";
 		}
+		setTypeString(typeString, arg);
+
+		isOverCapacity = checkAndSetCapacities(arg);
+		if (isOverCapacity || arg.useMapType)
+		{
+			typeString = "map...";
+			setTypeString(typeString, arg);
+			return null;
+		}
+
+		UMLCost fromCost = new UMLCost();
+		UMLCost toCost = new UMLCost();
+		node.from.apply(new UMLMapVisitor(), fromCost);
+		node.to.apply(new UMLMapVisitor(), toCost);
+		
+		Boolean abstractFrom = false;
+		Boolean abstractTo = false;
+		if (fromCost.cost > MAX_LOW_CAPACITY)
+		{
+			if (toCost.cost != 0)
+			{
+				abstractFrom = true;
+			}
+		}
+		if (toCost.cost > MAX_LOW_CAPACITY)
+		{
+			if (fromCost.cost != 0)
+			{
+				abstractTo = true;
+			}
+		}
+		System.out.println("(from,to): (" + fromCost.cost + "," + toCost.cost + "), for type: " + node.toString());
 		
 		arg.prevType = Type.MAP;
-		typeString += "map ";
-
+		arg.useMapType = true;
 		if (arg.useTempType)
 		{
-			arg.tempType += typeString;
+			arg.tempBeforeMap = true;
 		}
 		else
 		{
-			arg.inClassType += typeString;
+			arg.tempBeforeMap = false;
 		}
+		typeString = "map ";
+		setTypeString(typeString, arg);
 
+		if (abstractFrom)
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY);
+		}
+		else
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY * 2);
+		}
+		int capacityNum = arg.capacities.size();
 		node.from.apply(new UMLTypeVisitor(), arg);
-		isOverCapacity = checkCapacities(arg);
 		
-
-		typeString = " to ";
-
-		if (arg.useTempType)
+		int newCapacityNum = arg.capacities.size();
+		for (int i = capacityNum; i < newCapacityNum; i++)
 		{
-			arg.tempType += typeString;
+			arg.capacities.remove(arg.capacities.size() - 1);
+		}
+		arg.capacities.remove(arg.capacities.size() - 1);
+
+		arg.prevType = Type.MAP;
+		typeString = " to ";
+		setTypeString(typeString, arg);
+
+		if (abstractTo)
+		{
+			arg.addCapacity(MAX_LOW_CAPACITY);
 		}
 		else
 		{
-			arg.inClassType += typeString;
+			arg.addCapacity(MAX_LOW_CAPACITY * 2);
 		}
+		capacityNum = arg.capacities.size();
+		node.to.apply(new UMLTypeVisitor(), arg); 
 
-		node.to.apply(new UMLTypeVisitor(), arg);
+		arg.useMapType = false;
+		arg.tempBeforeMap = true;
+		setTypeString(arg.mapType, arg);
+		arg.mapType = "";
 
 		return null;
 	}
@@ -632,19 +606,15 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_HIGH_CAPACITY);
+		int capacityNum = arg.capacities.size();
+		int newCapacityNum;
+		System.out.println("capacities (product): " + arg.capacities);
+		isOverCapacity = checkCapacities(arg);
 
-		// arg.abstractedType = Type.PRODUCT;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -658,57 +628,67 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 
 		if (node.types.size() > MAX_NUM_OF_COMPOSITE_TYPES || arg.useTempType)
 		{
-			typeString += "*...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString = "*... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 
-		if (arg.useTempType)
+		setTypeString(typeString, arg);
+
+		int i = 0;
+		arg.useTempType = true;
+		if (arg.useMapType)
 		{
-			arg.tempType += typeString;
+			arg.tempBeforeMap = false;
 		}
 		else
 		{
-			arg.inClassType += typeString;
+			arg.tempBeforeMap = true;
 		}
 
-		int i = 1;
-		arg.useTempType = true;
 		for (TCType type : node.types)
 		{
 			arg.prevType = Type.PRODUCT;
 			type.apply(new UMLTypeVisitor(), arg);
-			if (i < node.types.size())
+			newCapacityNum = arg.capacities.size();
+			if (checkCapacities(arg) || i == node.types.size() - 1)
 			{
-				arg.tempType += " * ";
-				if (checkAndSetCapacities(arg))
-				{
-					i = node.types.size();
-				}
+				i = node.types.size();
+			}
+			else
+			{
+				setTypeString(" * ", arg);
+			}
+			for (int j = capacityNum; j < newCapacityNum; j++)
+			{
+				arg.capacities.remove(arg.capacities.size() - 1);
+			}
+			if (i > 1)
+			{
+				checkAndSetCapacities(arg);
 			}
 			i++;
 		}
+		
+		arg.useTempType = false;
+		arg.tempBeforeMap = false;
 		isOverCapacity = checkCapacities(arg);
+		typeString = "";
+
 		if (isOverCapacity)
 		{
 			for (i = 1; i < node.types.size(); i++)
 			{
-				arg.inClassType += "|";
+				typeString += "*";
 			}
 		}
 		else
 		{
-			arg.inClassType += arg.tempType;
+			typeString += arg.tempType;
 		}
 		arg.tempType = "";
-		arg.useTempType = false;
+		
+		setTypeString(typeString, arg);
 
 		return null;
 	}
@@ -718,22 +698,17 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	{
         arg.depth++;
 		String typeString = "";
+		int capacityNum = arg.capacities.size();
+		int newCapacityNum;
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_HIGH_CAPACITY);
+		System.out.println("capacities (union): " + arg.capacities);
 
-		// arg.abstractedType = Type.UNION;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -745,59 +720,69 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			typeString += " of ";
 		}
 
-		if (arg.useTempType)
-		{
-			arg.tempType += typeString;
-		}
-		else
-		{
-			arg.inClassType += typeString;
-		}
+		setTypeString(typeString, arg);
 
 		if (node.types.size() > MAX_NUM_OF_COMPOSITE_TYPES || arg.useTempType)
 		{
-			typeString += "|...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString = "|... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		
+		int i = 0;
 		arg.useTempType = true;
-		int i = 1;
+		if (arg.useMapType)
+		{
+			arg.tempBeforeMap = false;
+		}
+		else
+		{
+			arg.tempBeforeMap = true;
+		}
+
 		for (TCType type : node.types)
 		{
 			arg.prevType = Type.UNION;
 			type.apply(new UMLTypeVisitor(), arg);
-			if (i < node.types.size())
+			newCapacityNum = arg.capacities.size();
+			if (checkCapacities(arg) || i == node.types.size() - 1)
 			{
-				arg.tempType += " | ";
-				if (checkAndSetCapacities(arg))
-				{
-					i = node.types.size();
-				}
+				i = node.types.size();
+			}
+			else
+			{
+				setTypeString(" | ", arg);
+			}
+			for (int j = capacityNum; j < newCapacityNum; j++)
+			{
+				arg.capacities.remove(arg.capacities.size() - 1);
+			}
+			if (i > 1)
+			{
+				checkAndSetCapacities(arg);
 			}
 			i++;
 		}
+
+		arg.useTempType = false;
+		arg.tempBeforeMap = false;
 		isOverCapacity = checkCapacities(arg);
+		typeString = "";
+
 		if (isOverCapacity)
 		{
 			for (i = 1; i < node.types.size(); i++)
 			{
-				arg.inClassType += "|";
+				typeString += "|";
 			}
 		}
 		else
 		{
-			arg.inClassType += arg.tempType;
+			typeString += arg.tempType;
 		}
 		arg.tempType = "";
-		arg.useTempType = false;
+		
+		setTypeString(typeString, arg);
 
 		return null;
 	}
@@ -805,24 +790,17 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	@Override
 	public List<Object> caseRecordType(TCRecordType node, UMLType arg)
 	{
+		// TODO: Enter the identifiers of the fields as types
        	arg.depth++;
 		String typeString = "";
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_HIGH_CAPACITY);
 
-		// arg.abstractedType = Type.RECORD;
 		if (isOverCapacity)
 		{
-			typeString += "...";
-			if (arg.useTempType)
-			{
-				arg.tempType += typeString;
-			}
-			else
-			{
-				arg.inClassType += typeString;
-			}
+			typeString += "... ";
+			setTypeString(typeString, arg);
 			return null;
 		}
 		if (arg.prevType == Type.SET1 ||
@@ -834,16 +812,16 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			typeString += " of ";
 		}
 
-		typeString += "::...";
-
-		if (arg.useTempType)
+		if (!arg.isType)
 		{
-			arg.tempType += typeString;
+			typeString += node.name.toString();
 		}
 		else
 		{
-			arg.inClassType += typeString;
+			typeString += "::";
 		}
+
+		setTypeString(typeString, arg);
 		
 		return null;
 	}
@@ -858,7 +836,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			param.apply(new UMLTypeVisitor(), paramUMLType);
 			arg.paramsType += paramUMLType.inClassType;
 			
-			// Remove whitespace at endparameter
+			// Remove whitespace at end parameter
 			if (arg.paramsType.length() > 1)
 			{
 				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
@@ -887,7 +865,7 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 			param.apply(new UMLTypeVisitor(), paramUMLType);
 			arg.paramsType += paramUMLType.inClassType;
 
-			// Remove whitespace at endparameter
+			// Remove whitespace at end parameter
 			if (arg.paramsType.length() > 1)
 			{
 				if (Character.isWhitespace(arg.paramsType.charAt(arg.paramsType.length() - 1)))
@@ -903,6 +881,35 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		node.result.apply(new UMLTypeVisitor(), returnUMLType);
 		arg.returnType = returnUMLType.inClassType;
 		
+		return null;
+	}
+
+	@Override
+	public List<Object> caseBracketType(TCBracketType node, UMLType arg)
+	{
+		arg.depth++;
+		String typeString = "";
+
+		Boolean isOverCapacity = checkAndSetCapacities(arg);
+
+		if (isOverCapacity)
+		{
+			typeString += "... ";
+			setTypeString(typeString, arg);
+			return null;
+		}
+
+		if (arg.prevType == Type.SET1 ||
+			arg.prevType == Type.SET  || 
+			arg.prevType == Type.SEQ1 || 
+			arg.prevType == Type.SEQ
+		)
+		{
+			typeString += " of ";
+		}
+		typeString += "?";
+		setTypeString(typeString, arg);
+		// node.type.apply(new UMLTypeVisitor(), arg);
 		return null;
 	}
 

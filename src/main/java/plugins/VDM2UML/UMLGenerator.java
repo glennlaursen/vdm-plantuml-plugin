@@ -56,8 +56,6 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		UMLType umlType = new UMLType(PlantBuilder.env, false);
 		type.apply(new UMLAssociationCheckVisitor(), umlType);
 
-		System.out.println("isAsoc: " + umlType.isAsoc + ", for type: " + type.toString());
-
 		String visibility = visibility(node.accessSpecifier);
 		String varName = node.name.getName();
 		String className = node.classDefinition.name.getName();
@@ -106,7 +104,7 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 			{
 				arg.defs.append(visibility);
 			}
-			arg.defs.append(varName + " : " + umlType.inClassType);
+			arg.defs.append(varName + " : " + umlInstanceType.inClassType);
 			arg.defs.append("\n");
 		}
 		
@@ -117,7 +115,9 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	public Object caseTypeDefinition(TCTypeDefinition node, PlantBuilder arg)
 	{
 		TCType type = node.getType();
+		// System.out.println(node.name.getName());
 		UMLType umlType = new UMLType(PlantBuilder.env, true);
+		umlType.namedType = node.name.getName();
 		type.apply(new UMLTypeVisitor(), umlType);
 
 		arg.defs.append("\t");
@@ -134,6 +134,8 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 	@Override
 	public Object caseValueDefinition(TCValueDefinition node, PlantBuilder arg)
 	{
+		// TODO: Show what the value is?
+
 		for (TCDefinition def : node.getDefinitions()) 
 		{
 			TCType type = def.getType();

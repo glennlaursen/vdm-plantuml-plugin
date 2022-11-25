@@ -17,14 +17,18 @@ public class UMLType
     public Type prevType = Type.NONE;
     public Boolean isType = false;
     public Boolean useTempType = false;
+    public Boolean useMapType = false;
+    public Boolean tempBeforeMap = false;
     public String qualifier = "";
     public String multiplicity = "";
     public String endClass = "";
     public String inClassType = "";
     public String tempType = "";
+    public String namedType = "";
+    public String mapType = "";
     public String paramsType = "";
     public String returnType = "";
-    public int maxDepth = 10;
+    public String currentClass = "";
     public int typeCost = 0;
     public ArrayList<Point> capacities;
     public int depth = 0;
@@ -36,25 +40,10 @@ public class UMLType
         env = _env;
     }
 
-    public UMLType(PublicClassEnvironment _env, int _maxDepth) 
-    {
-        capacities = new ArrayList<Point>(0);
-        env = _env;
-        maxDepth = _maxDepth;
-    }
-
     public UMLType(PublicClassEnvironment _env, Boolean _isType) 
     {
         capacities = new ArrayList<Point>(0);
         env = _env;
-        isType = _isType;
-    }
-
-    public UMLType(PublicClassEnvironment _env, int _maxDepth, Boolean _isType) 
-    {
-        capacities = new ArrayList<Point>(0);
-        env = _env;
-        maxDepth = _maxDepth;
         isType = _isType;
     }
 

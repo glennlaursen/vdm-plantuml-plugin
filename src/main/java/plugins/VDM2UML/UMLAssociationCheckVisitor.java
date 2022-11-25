@@ -3,15 +3,19 @@ package plugins.VDM2UML;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
+import com.fujitsu.vdmj.tc.types.TCProductType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.visitors.TCLeafTypeVisitor;
 
 import plugins.VDM2UML.UMLType.Type;
@@ -42,21 +46,6 @@ public class UMLAssociationCheckVisitor extends TCLeafTypeVisitor<Object, List<O
 	@Override
 	public List<Object> caseNamedType(TCNamedType node, UMLType arg)
 	{
-		arg.depth++;
-		if (arg.depth == 1)
-		{
-			return null;
-		}
-		
-		if (node.isClass(arg.env))
-		{
-			arg.endClass = node.toString();
-			arg.isAsoc = true;
-		}
-		else
-		{
-			arg.isAsoc = false;
-		}
 		return null;
 	}
 
@@ -172,12 +161,18 @@ public class UMLAssociationCheckVisitor extends TCLeafTypeVisitor<Object, List<O
 		{
 			return null;
 		}
+
+		if (node.from.isClass(arg.env))
+		{
+			return null;
+		}
 		
 		arg.isMap = true;
 
-		// TODO: Use visitor for qualifier
 		arg.qualifier += "(";
-		arg.qualifier += node.from.toString();
+		UMLType umlType = new UMLType(arg.env, false);
+		node.from.apply(new UMLTypeVisitor(), umlType);
+		arg.qualifier += umlType.inClassType;
 		arg.qualifier += ")";
 		
 		arg.prevType = Type.INMAP;
@@ -194,15 +189,45 @@ public class UMLAssociationCheckVisitor extends TCLeafTypeVisitor<Object, List<O
 		{
 			return null;
 		}
+
+		if (node.from.isClass(arg.env))
+		{
+			return null;
+		}
 		
 		arg.isMap = true;
 
-		// TODO: Use visitor for qualifier
-		arg.qualifier += node.from.toString();
+		UMLType umlType = new UMLType(arg.env, false);
+		node.from.apply(new UMLTypeVisitor(), umlType);
+		arg.qualifier += umlType.inClassType;
 		
 		arg.prevType = Type.MAP;
 		node.to.apply(new UMLAssociationCheckVisitor(), arg);
 
+		return null;
+	}
+
+	@Override
+	public List<Object> caseRecordType(TCRecordType node, UMLType arg)
+	{
+		return null;
+	}
+
+	@Override
+	public List<Object> caseProductType(TCProductType node, UMLType arg)
+	{
+		return null;
+	}
+
+	@Override
+	public List<Object> caseUnionType(TCUnionType node, UMLType arg)
+	{
+		return null;
+	}
+
+	@Override
+	public List<Object> caseBracketType(TCBracketType node, UMLType arg)
+	{
 		return null;
 	}
 
