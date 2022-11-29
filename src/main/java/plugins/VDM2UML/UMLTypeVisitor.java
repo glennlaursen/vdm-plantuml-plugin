@@ -27,7 +27,7 @@ import plugins.VDM2UML.UMLType.Type;
 public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLType>
 {
 	static int MAX_LOW_CAPACITY = 1;			// Capacity map, set, seq and optional types
-	static int MAX_HIGH_CAPACITY = 3;			// Capacity union, product and record (?) types
+	static int MAX_HIGH_CAPACITY = 3;			// Capacity union, product and record types
 	static int MAX_NUM_OF_COMPOSITE_TYPES = 5;
 
 	// Check if a type is onethe basic typesVDM
@@ -785,15 +785,11 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 	@Override
 	public List<Object> caseRecordType(TCRecordType node, UMLType arg)
 	{
-		// TODO: Enter the identifiers of the fields as types
        	arg.depth++;
 		String typeString = "";
 
 		Boolean isOverCapacity = checkAndSetCapacities(arg);
 		arg.addCapacity(MAX_HIGH_CAPACITY);
-
-		int capacityNum = arg.capacities.size();
-		int newCapacityNum;
 
 		if (isOverCapacity)
 		{
@@ -812,16 +808,16 @@ public class UMLTypeVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLT
 		
 		arg.prevType = Type.RECORD;
 
-		if (node.fields.size() > MAX_NUM_OF_COMPOSITE_TYPES)
+		if (!arg.isType || !arg.namedType.equals(node.name.toString()))
 		{
-			typeString = ":: ";
+			typeString += node.name.toString();
 			setTypeString(typeString, arg);
 			return null;
 		}
 
-		if (!arg.isType || !arg.namedType.equals(node.name.toString()))
+		if (node.fields.size() > MAX_NUM_OF_COMPOSITE_TYPES)
 		{
-			typeString += node.name.toString();
+			typeString = ":: ";
 			setTypeString(typeString, arg);
 			return null;
 		}
