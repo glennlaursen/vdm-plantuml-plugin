@@ -4,7 +4,7 @@ import org.w3c.dom.NodeList;
 public class XMIAttribute {
     
     public enum AttTypes {type, value, var}
-    public enum MulTypes {set, seq, set1, seq1, empty}
+    public enum MulTypes {set, seq, set1, seq1, optional, empty}
     public enum QualiTypes {map, inmap}
 
     private String name;
@@ -19,24 +19,24 @@ public class XMIAttribute {
     private String visibility;
     private Boolean isAssociative;
     private Boolean isStatic;
-    private Boolean isAbstract;
+    //private Boolean isAbstract;
 
     public XMIAttribute(Element aElement)
     {     
         this.isAssociative = false;
         this.isQualified = false;
         this.isStatic = false;
-        this.isAbstract = false;
+        //this.isAbstract = false;
 
         if(aElement.getAttribute("isStatic").equals("true"))
         {
             this.isStatic = true;
         }
 
-        if(aElement.getAttribute("isAbstract").equals("true"))
+        /* if(aElement.getAttribute("isAbstract").equals("true"))
         {
             this.isAbstract = true;
-        }
+        } */
             
         setAttType(aElement);
 
@@ -123,6 +123,9 @@ public class XMIAttribute {
         
         else if(mult.equals("*"))
             this.mulType = MulTypes.set;    
+
+        else if(mult.equals("0...1") || mult.equals("0..1") || mult.equals("0.1"))
+            this.mulType = MulTypes.optional; 
             
         else this.mulType = MulTypes.empty;
     }
@@ -247,7 +250,7 @@ public class XMIAttribute {
        
         else if (this.attType == AttTypes.var)
         {
-            String abs = this.isAbstract ? "abstract " : "";
+            //String abs = this.isAbstract ? "abstract " : "";
             String stat = this.isStatic ? "static " : "";
             String maptype = "";
             String asoc = "";
@@ -261,14 +264,16 @@ public class XMIAttribute {
             
             if(this.isAssociative)
             {
+                String _relName = this.mulType == MulTypes.optional ? "[" + this.relName + "]" : this.relName; 
+       
                 if(!this.isQualified)
-                    asoc = " : " + getMulType() + this.relName;
-        
+                    asoc = " : " + getMulType() + _relName;
+                
                 else
-                    asoc = getMulType() + this.relName;
+                    asoc = getMulType() +_relName;
             }
 
-            return stat + abs + this.visibility + this.name + map + asoc + ";\n";
+            return stat + this.visibility + this.name + map + asoc + ";\n";
         }
         
         else return "undef";
