@@ -316,7 +316,11 @@ public class UMLGenerator extends TCDefinitionVisitor<Object, PlantBuilder>
 		boiler.append("\tBackgroundColor AntiqueWhite\n");
 		boiler.append("\tArrowColor Black\n");
 		boiler.append("\tBorderColor Black\n}\n");
-		boiler.append("skinparam defaultTextAlignment center\n\n");
+		boiler.append("skinparam defaultTextAlignment center\n");
+		boiler.append("skinparam linetype ortho\n");
+		boiler.append("skinparam Dpi 300\n");
+		boiler.append("' skinparam backgroundColor transparent\n\n");
+		
 
 		return boiler;
 	}

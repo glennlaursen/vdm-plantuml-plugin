@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.types.TCBracketType;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -70,7 +71,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 	{
 		if (!isBasicType(node))
 		{
-			umlCost.cost = umlCost.cost + 1;
+			umlCost.cost++;
 		}
 		return null;
 	}
@@ -78,14 +79,14 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 	@Override
 	public List<Object> caseNamedType(TCNamedType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		return null;
 	}
 
 	@Override
 	public List<Object> caseSet1Type(TCSet1Type node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.setof.apply(new UMLMapVisitor(), umlCost);
 		return null;
 	}
@@ -93,7 +94,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
     @Override
 	public List<Object> caseSetType(TCSetType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.setof.apply(new UMLMapVisitor(), umlCost);
 		return null;
 	}
@@ -101,7 +102,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
     @Override
 	public List<Object> caseSeq1Type(TCSeq1Type node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.seqof.apply(new UMLMapVisitor(), umlCost);
 		return null;
 	}
@@ -109,7 +110,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
     @Override
 	public List<Object> caseSeqType(TCSeqType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.seqof.apply(new UMLMapVisitor(), umlCost);
 		return null;
 	}
@@ -117,7 +118,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 	@Override
 	public List<Object> caseOptionalType(TCOptionalType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.type.apply(new UMLMapVisitor(), umlCost);
 		return null;
 	}
@@ -125,7 +126,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 	@Override
 	public List<Object> caseInMapType(TCInMapType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.from.apply(new UMLMapVisitor(), umlCost);
 		node.to.apply(new UMLMapVisitor(), umlCost);
 		return null;
@@ -134,7 +135,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
     @Override
 	public List<Object> caseMapType(TCMapType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		umlCost.cost++;
 		node.from.apply(new UMLMapVisitor(), umlCost);
 		node.to.apply(new UMLMapVisitor(), umlCost);
 		return null;
@@ -149,7 +150,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 			type.apply(new UMLMapVisitor(), umlCost);
 			if (i < node.types.size() - 1) 
 			{
-				umlCost.cost = umlCost.cost + 1;
+				umlCost.cost++;
 			}
 			i++;
 		}
@@ -165,7 +166,7 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 			type.apply(new UMLMapVisitor(), umlCost);
 			if (i < node.types.size() - 1) 
 			{
-				umlCost.cost = umlCost.cost + 1;
+				umlCost.cost++;
 			}
 			i++;
 		}
@@ -175,14 +176,21 @@ public class UMLMapVisitor extends TCLeafTypeVisitor<Object, List<Object>, UMLCo
 	@Override
 	public List<Object> caseRecordType(TCRecordType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
+		int i = 0;
+		for (TCField field : node.fields)
+		{
+			if (i < node.fields.size() - 1) 
+			{
+				umlCost.cost++;
+			}
+			i++;
+		}
 		return null;
 	}
 
 	@Override
 	public List<Object> caseBracketType(TCBracketType node, UMLCost umlCost)
 	{
-		umlCost.cost = umlCost.cost + 1;
 		return null;
 	}
 
