@@ -111,7 +111,7 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url default-value="https://maven.pkg.github.com/jolnd/vdm-plantuml-plugin">${env. GITHUB_PACKAGES_REPO_URL}</url>
+			<url default-value="https://maven.pkg.github.com/jolnd/vdm-plantuml-plugin">${env.GITHUB_PACKAGES_REPO_URL}</url>
 		</repository>
 	</distributionManagement>
 </project>
