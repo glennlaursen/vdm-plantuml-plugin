@@ -44,6 +44,6 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.VDM_VSCODE_PAT }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/glennlaursen/vdm-vscode/dispatches \
-          -d '{"event_type":"new-jar"}, "client_payload":{"repository": "${{ github.repository }}"}'
+          -d '{"event_type":"new-jar","client_payload":{"repository":"${{ github.repository }}"}}'
         
     
