@@ -42,17 +42,12 @@ jobs:
       - name: Checking out
         uses: actions/checkout@v3
         
-      - name: Getting POM version
-        id: get_version
-        run: echo "version=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-        
-      - name: Getting POM groupId
-        id: get_groupId
-        run: echo "groupId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.groupId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-      
-      - name: Getting POM artifactId
-        id: get_artifactId
-        run: echo "artifactId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.artifactId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+      - name: Getting POM artifact info
+        id: get_artifact_info
+        run: |
+          echo "version=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+          echo "groupId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.groupId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+          echo "artifactId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.artifactId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
         
       - name: Send repository dispatch http request to VDM-VSCode
         run: |
@@ -64,9 +59,9 @@ jobs:
                 "event_type": "new-jar",
                 "client_payload": {
                   "repository": "${{ github.repository }}",
-                  "version": "${{ steps.get_version.outputs.version }}",
-                  "groupId": "${{ steps.get_version.outputs.groupId }}",
-                  "artifactId": "${{ steps.get_version.outputs.artifactId }}"
+                  "version": "${{ steps.get_artifact_info.outputs.version }}",
+                  "groupId": "${{ steps.get_artifact_info.outputs.groupId }}",
+                  "artifactId": "${{ steps.get_artifact_info.outputs.artifactId }}"
                 }
               }'
         
