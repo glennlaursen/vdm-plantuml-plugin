@@ -58,10 +58,8 @@ jobs:
           -d '{
                 "event_type": "new-jar",
                 "client_payload": {
-                  "repository": "${{ github.repository }}",
+                  "configId": "vdm-plantuml-plugin",
                   "version": "${{ steps.get_artifact_info.outputs.version }}",
-                  "groupId": "${{ steps.get_artifact_info.outputs.groupId }}",
-                  "artifactId": "${{ steps.get_artifact_info.outputs.artifactId }}"
                 }
               }'
      
