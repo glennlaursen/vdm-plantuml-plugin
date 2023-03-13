@@ -64,5 +64,16 @@ jobs:
                   "artifactId": "${{ steps.get_artifact_info.outputs.artifactId }}"
                 }
               }'
-        
+     
+  test: # make sure the action works on a clean machine without building
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout Delete Package Versions Repo
+    - uses: actions/delete-package-versions@v4
+      with:
+        package-name: 'dk.au.ece.vdmj.uml'
+        package-type: 'maven'
+        min-version-to-keep: 5
     
