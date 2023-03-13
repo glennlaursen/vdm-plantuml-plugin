@@ -59,7 +59,7 @@ jobs:
                 "event_type": "new-jar",
                 "client_payload": {
                   "configId": "vdm-plantuml-plugin",
-                  "version": "${{ steps.get_artifact_info.outputs.version }}",
+                  "version": "${{ steps.get_artifact_info.outputs.version }}"
                 }
               }'
      
