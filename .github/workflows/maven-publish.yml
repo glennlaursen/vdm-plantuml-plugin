@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
 
     runs-on: ubuntu-latest
     permissions:
@@ -32,7 +32,7 @@ jobs:
         
   signal-vdm-vscode:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-deploy
     if: ${{ github.ref_name }} == 'main' && ${{ github.repository }} == "glennlaursen/vdm-plantuml-plugin"
     
     steps:
@@ -59,16 +59,3 @@ jobs:
                   "version": "${{ steps.get_artifact_info.outputs.version }}"
                 }
               }'
-     
-  test: # make sure the action works on a clean machine without building
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      name: Checkout Delete Package Versions Repo
-    - uses: actions/delete-package-versions@v4
-      with:
-        package-name: 'dk.au.ece.vdmj.uml'
-        package-type: 'maven'
-        min-version-to-keep: 5
-    
