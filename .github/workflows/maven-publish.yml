@@ -49,7 +49,7 @@ jobs:
       - name: Send repository dispatch http request to VDM-VSCode
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.VDM_VSCODE_PAT }}
           repository: glennlaursen/vdm-vscode
           event-type: new-jar
           client-payload: |
