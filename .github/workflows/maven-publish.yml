@@ -52,8 +52,4 @@ jobs:
           token: ${{ secrets.VDM_VSCODE_PAT }}
           repository: glennlaursen/vdm-vscode
           event-type: new-jar
-          client-payload: |
-            '{
-              "configId": "vdm-plantuml-plugin",
-              "version": "${{ steps.get_artifact_info.outputs.version }}"
-            }'
+          client-payload: '{ "configId": "vdm-plantuml-plugin", "version": "${{ steps.get_artifact_info.outputs.version }}" }'
