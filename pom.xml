@@ -70,7 +70,7 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<appendAssemblyId>false</appendAssemblyId>
+					<appendAssemblyId>true</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
