@@ -43,8 +43,6 @@ jobs:
         id: get_artifact_info
         run: |
           echo "version=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-          echo "groupId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.groupId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-          echo "artifactId=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.artifactId}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
         
       - name: Send repository dispatch http request to VDM-VSCode
         uses: peter-evans/repository-dispatch@v2
